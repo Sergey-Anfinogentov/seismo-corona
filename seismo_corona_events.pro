@@ -40,6 +40,15 @@ pro seismo_corona_close, ev
   print, 'close'
 end
 
+pro seismo_corona_cleanup, ev
+common seismo_corona
+  global.remove,global.keys()
+  global = []
+  message,'CleanUP completed',/info
+  
+
+end
+
 pro seismo_corona_events,ev
   Message,'unprocessed event',/info
 end

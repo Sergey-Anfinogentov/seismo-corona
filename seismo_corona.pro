@@ -7,5 +7,5 @@ compile_opt idl2
   WIDGET_CONTROL, base, /REALIZE
   
   
-  XMANAGER, 'seismo_corona', base, event_handler = 'seismo_corona_events'
+  XMANAGER, 'seismo_corona', base, event_handler = 'seismo_corona_events', cleanup = 'seismo_corona_cleanup'
 end
