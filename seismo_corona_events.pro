@@ -19,10 +19,12 @@ common seismo_corona
   files = file_search(filepath('*.fits', root_dir = dir_name))
   read_sdo, files, index, data,/use_shared_lib, /uncomp_delete
   message,'Reading data complete', /info
+  sz = size(data)
   global['index'] = temporary(index)
   global['data'] = temporary(data)
   global['state'] = 'data loaded'
-
+  frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
+  widget_control, frame_selector, SET_SLIDER_MAX = sz[3] - 1
 end
 
 pro seismo_corona_plot_frame, ev

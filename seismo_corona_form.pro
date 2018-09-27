@@ -23,7 +23,7 @@ function seismo_corona_form
   right_panel = WIDGET_BASE(base,/column)
   
   draw_sun = WIDGET_DRAW(left_panel, xsize = 800, ysize = 600)
-  frame_selector = widget_slider(left_panel, event_pro = 'seismo_corona_plot_frame')
+  frame_selector = widget_slider(left_panel, uname = 'frame_selector', event_pro = 'seismo_corona_plot_frame')
   
   button_add = widget_button(right_panel, xsize = 150, value = 'Add loop', event_pro = 'seismo_corona_add_loop')
   button_del = widget_button(right_panel, xsize = 150, value = 'Delete loop', event_pro = 'seismo_corona_delete_loop')
