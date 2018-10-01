@@ -25,12 +25,15 @@ common seismo_corona
   global['state'] = 'data loaded'
   frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
   widget_control, frame_selector, SET_SLIDER_MAX = sz[3] - 1
+  seismo_corona_plot_frame, ev
 end
 
 pro seismo_corona_plot_frame, ev
 common seismo_corona
   if global['state'] eq 'no data' then return
-  implot, comprange((global['data'])[*,*,ev.value],/global),/iso
+  frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
+  widget_control, frame_selector, get_value = frame_num
+  implot, comprange((global['data'])[*,*,frame_num],/global),/iso
 end
 
 pro seismo_corona_save, ev
