@@ -3,6 +3,10 @@ pro seismo_corona_add_loop, ev
   if global['state'] eq 'no data' then retu
   print, 'Add_loop'
   loop = time_distance_ellipse(global['data'],/current_plot)
+  global['loops'].Add, loop
+  loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
+  loop_count = global['loops'].count()
+  widget_control, loop_list, set_value = 'loop '+ strcompress(indgen(loop_count),/remove_all)
 end
 pro seismo_corona_delete_loop, ev
   print, 'Delete_loop'
