@@ -41,6 +41,16 @@ common seismo_corona
   frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
   widget_control, frame_selector, get_value = frame_num
   implot, comprange((global['data'])[*,*,frame_num],/global),/iso
+  seismo_corona_plot_loops, ev
+end
+
+pro seismo_corona_plot_loops, ev
+  common seismo_corona
+  if global['state'] eq 'no data' then return
+  if global['loops'].count() eq 0 then return
+  for i =0, global['loops'].count()-1 do begin
+    oplot, (global['loops'])[i].x, (global['loops'])[i].y
+  endfor
 end
 
 pro seismo_corona_save, ev
