@@ -28,7 +28,7 @@ function seismo_corona_form
   button_add = widget_button(right_panel, xsize = 150, value = 'Add loop', event_pro = 'seismo_corona_add_loop')
   button_del = widget_button(right_panel, xsize = 150, value = 'Delete loop', event_pro = 'seismo_corona_delete_loop')
   
-  list = WIDGET_LIST(right_panel, VALUE=['loop 1', 'loop 2'], YSIZE=3)
+  list = WIDGET_LIST(right_panel, YSIZE=3)
   
   return, base
 end

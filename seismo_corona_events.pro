@@ -1,5 +1,8 @@
 pro seismo_corona_add_loop, ev
+  common seismo_corona
+  if global['state'] eq 'no data' then retu
   print, 'Add_loop'
+  loop = time_distance_ellipse(global['data'],/current_plot)
 end
 pro seismo_corona_delete_loop, ev
   print, 'Delete_loop'
