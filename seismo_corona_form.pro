@@ -22,6 +22,8 @@ function seismo_corona_form
   left_panel  = WIDGET_BASE(base,/column)
   right_panel = WIDGET_BASE(base,/column)
   
+  draw_sun = WIDGET_text(left_panel, uname = 'status_text', value = 'No data loaded')
+  
   draw_sun = WIDGET_DRAW(left_panel, xsize = 800, ysize = 600)
   frame_selector = widget_slider(left_panel, uname = 'frame_selector', event_pro = 'seismo_corona_plot_frame')
   
