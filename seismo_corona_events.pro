@@ -8,6 +8,12 @@ pro seismo_corona_add_loop, ev
   loop_count = global['loops'].count()
   widget_control, loop_list, set_value = 'loop '+ strcompress(indgen(loop_count),/remove_all)
 end
+
+pro seismo_corona_show_status, ev, text
+  status_text = widget_info(ev.top, find_by_uname = 'status_text')
+  widget_control, status_text, set_value = text
+end
+
 pro seismo_corona_delete_loop, ev
   print, 'Delete_loop'
 end
@@ -15,7 +21,7 @@ pro seismo_corona_select_loop, ev
 common seismo_corona
   seismo_corona_plot_frame, ev
 end
-pro seismo_corona_open, ev
+pro seismo_corona_open, evseismo_corona_show_status, ev, text
 common seismo_corona
   print, 'Open event fired'
   file_name = dialog_pickfile(title = 'Select save file with data')
@@ -27,6 +33,7 @@ pro seismo_corona_import_fits, ev
 common seismo_corona
   dir_name = dialog_pickfile(title = 'Select directory with FITs files', /directory, path = '/home/sergey/data/kink_magnetic/limb2')
   message,'Reading data from '+dir_name +' ...', /info
+  seismo_corona_show_status, ev, 'Reading data...'
   files = file_search(filepath('*.fits', root_dir = dir_name))
   read_sdo, files, index, data,/use_shared_lib, /uncomp_delete
   message,'Reading data complete', /info
@@ -37,6 +44,7 @@ common seismo_corona
   frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
   widget_control, frame_selector, SET_SLIDER_MAX = sz[3] - 1
   seismo_corona_plot_frame, ev
+  seismo_corona_show_status, ev, 'Waiting for a user command...'
 end
 
 pro seismo_corona_plot_frame, ev
