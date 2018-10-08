@@ -11,6 +11,10 @@ end
 pro seismo_corona_delete_loop, ev
   print, 'Delete_loop'
 end
+pro seismo_corona_select_loop, ev
+common seismo_corona
+  print, 'Select loop'+ strcompress(ev.index)
+end
 pro seismo_corona_open, ev
 common seismo_corona
   print, 'Open event fired'
