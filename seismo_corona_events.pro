@@ -13,7 +13,7 @@ pro seismo_corona_delete_loop, ev
 end
 pro seismo_corona_select_loop, ev
 common seismo_corona
-  print, 'Select loop'+ strcompress(ev.index)
+  seismo_corona_plot_frame, ev
 end
 pro seismo_corona_open, ev
 common seismo_corona
@@ -55,6 +55,11 @@ pro seismo_corona_plot_loops, ev
   for i =0, global['loops'].count()-1 do begin
     oplot, (global['loops'])[i].x, (global['loops'])[i].y
   endfor
+  loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
+  loop_index = widget_info(loop_list, /LIST_SELECT)
+  if loop_index ge 0 then begin
+    oplot, (global['loops'])[loop_index].x, (global['loops'])[loop_index].y, thick = 2
+  endif
 end
 
 pro seismo_corona_save, ev
