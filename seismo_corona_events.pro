@@ -12,6 +12,9 @@ pro seismo_corona_add_loop, ev
   loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
   loop_count = global['loops'].count()
   widget_control, loop_list, set_value = 'loop '+ strcompress(indgen(loop_count),/remove_all)
+  
+  length = seismo_corona_loop_length(index, ev)
+  
   seismo_corona_plot_frame, ev
   seismo_corona_show_status, ev, 'Ready'
 end
