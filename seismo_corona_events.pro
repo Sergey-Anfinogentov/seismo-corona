@@ -55,7 +55,7 @@ common seismo_corona
   frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
   widget_control, frame_selector, get_value = frame_num
   
-  index = (global['index'])[frame_num]
+  index = (global['index'])[0]
   
   x_arcsec = hdr2x(index)
   y_arcsec = hdr2y(index) 
