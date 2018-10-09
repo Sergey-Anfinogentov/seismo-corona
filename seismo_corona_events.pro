@@ -2,7 +2,12 @@ pro seismo_corona_add_loop, ev
   common seismo_corona
   if global['state'] eq 'no data' then retu
   seismo_corona_show_status, ev, 'Click points to select a loop. Right click finalises selection.'
-  loop = time_distance_ellipse(global['data'],/current_plot)
+  
+  index = (global['index'])[0]
+  x_arcsec = hdr2x(index)
+  y_arcsec = hdr2y(index)
+  
+  loop = time_distance_ellipse(global['data'], x_arcsec, y_arcsec, /current_plot)
   global['loops'].Add, loop
   loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
   loop_count = global['loops'].count()
