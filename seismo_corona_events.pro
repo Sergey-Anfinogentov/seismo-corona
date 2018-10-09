@@ -54,7 +54,14 @@ common seismo_corona
   if global['state'] eq 'no data' then return
   frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
   widget_control, frame_selector, get_value = frame_num
-  implot, comprange((global['data'])[*,*,frame_num],/global),/iso
+  
+  index = (global['index'])[frame_num]
+  
+  x_arcsec = hdr2x(index)
+  y_arcsec = hdr2y(index) 
+  
+  implot, comprange((global['data'])[*,*,frame_num],/global), x_arcsec, y_arcsec,/iso, $
+    xtitle = 'X [arcsec]', ytitle = "Y [arcsec]"
   seismo_corona_plot_loops, ev
 end
 
