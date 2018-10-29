@@ -30,6 +30,12 @@ function seismo_corona_loop_length, index, ev
     return, length
   endif
   
+  wcs_convert_from_coord, wcs, points, 'hcc', points_x, points_y 
+  d_loop = sqrt((points_x[1] - points_x[0])^2 + (points_y[1] - points_y[0])^2)
+  length = !dpi * d_loop * 1d-6
+  print, 'loop length',length
+  return, length
+  
   stop
 
 end
