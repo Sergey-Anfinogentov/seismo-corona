@@ -95,6 +95,11 @@ compile_opt idl2
   endif
 end
 
+pro seismo_corona_plot_td, ev
+compile_opt idl2
+  print, 'Plot TD'
+end
+
 pro seismo_corona_save, ev
 compile_opt idl2
   print, 'save'

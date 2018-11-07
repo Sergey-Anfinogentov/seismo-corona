@@ -23,14 +23,20 @@ compile_opt idl2
   left_panel  = WIDGET_BASE(base,/column)
   right_panel = WIDGET_BASE(base,/column)
   
-  draw_sun = WIDGET_text(left_panel, uname = 'status_text', value = 'No data loaded')
+  status_text = WIDGET_text(left_panel, uname = 'status_text', value = 'No data loaded')
   
   tabs = widget_tab(left_panel)
   image_view = widget_base(tabs,/column, title = 'Image View')
   td_view = widget_base(tabs,/column, title = 'Time-distance View')
   
+  ;content of the image view tab
   draw_sun = WIDGET_DRAW(image_view, xsize = 800, ysize = 600)
   frame_selector = widget_slider(image_view, uname = 'frame_selector', event_pro = 'seismo_corona_plot_frame')
+  
+  ;content of Time-Distance view tab
+  draw_td = WIDGET_DRAW(td_view, xsize = 800, ysize = 400)
+  frame_selector = widget_slider(td_view, uname = 'slit_selector', event_pro = 'seismo_corona_plot_td')
+  
   
   button_add = widget_button(right_panel, xsize = 150, value = 'Add loop', event_pro = 'seismo_corona_add_loop')
   button_del = widget_button(right_panel, xsize = 150, value = 'Delete loop', event_pro = 'seismo_corona_delete_loop')
