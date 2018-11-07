@@ -9,6 +9,7 @@
 ; :Author: Sergey Anfinogentov (anfinogentov@iszf.irk.ru)
 ;-
 function seismo_corona_form
+compile_opt idl2
   base = WIDGET_BASE( xsize = 1000, ysize = 700, /row, mbar = bar, title = 'Seismo corona')
   menu_file = WIDGET_BUTTON(bar, VALUE='file', /MENU)
     button_open   = WIDGET_BUTTON(menu_file, VALUE='Open...', event_pro = 'seismo_corona_open')

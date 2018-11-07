@@ -1,4 +1,5 @@
 pro seismo_corona_add_loop, ev
+  compile_opt idl2
   common seismo_corona
   if global['state'] eq 'no data' then retu
   seismo_corona_show_status, ev, 'Click points to select a loop. Right click finalises selection.'
@@ -20,18 +21,22 @@ pro seismo_corona_add_loop, ev
 end
 
 pro seismo_corona_show_status, ev, text
+compile_opt idl2
   status_text = widget_info(ev.top, find_by_uname = 'status_text')
   widget_control, status_text, set_value = text
 end
 
 pro seismo_corona_delete_loop, ev
+compile_opt idl2
   print, 'Delete_loop'
 end
 pro seismo_corona_select_loop, ev
+compile_opt idl2
 common seismo_corona
   seismo_corona_plot_frame, ev
 end
 pro seismo_corona_open, evseismo_corona_show_status, ev, text
+compile_opt idl2
 common seismo_corona
   print, 'Open event fired'
   file_name = dialog_pickfile(title = 'Select save file with data')
@@ -40,6 +45,7 @@ common seismo_corona
 end
 
 pro seismo_corona_import_fits, ev
+compile_opt idl2
 common seismo_corona
   dir_name = dialog_pickfile(title = 'Select directory with FITs files', /directory, path = '/home/sergey/data/kink_magnetic/limb2')
   message,'Reading data from '+dir_name +' ...', /info
@@ -58,6 +64,7 @@ common seismo_corona
 end
 
 pro seismo_corona_plot_frame, ev
+compile_opt idl2
 common seismo_corona
   if global['state'] eq 'no data' then return
   frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
@@ -74,6 +81,7 @@ common seismo_corona
 end
 
 pro seismo_corona_plot_loops, ev
+compile_opt idl2
   common seismo_corona
   if global['state'] eq 'no data' then return
   if global['loops'].count() eq 0 then return
@@ -88,13 +96,16 @@ pro seismo_corona_plot_loops, ev
 end
 
 pro seismo_corona_save, ev
+compile_opt idl2
   print, 'save'
 end
 pro seismo_corona_close, ev
+compile_opt idl2
   print, 'close'
 end
 
 pro seismo_corona_cleanup, ev
+compile_opt idl2
 common seismo_corona
   global.remove,global.keys()
   global = []
@@ -104,5 +115,6 @@ common seismo_corona
 end
 
 pro seismo_corona_events,ev
+compile_opt idl2
   Message,'unprocessed event',/info
 end

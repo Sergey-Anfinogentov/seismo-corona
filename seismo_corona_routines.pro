@@ -1,8 +1,10 @@
 function seismo_corona_read_data, file_name
+compile_opt idl2
 
 end
 
 function seismo_corona_loop_length, index, ev
+compile_opt idl2
 
   wcs = fitshead2wcs(index)
   
@@ -41,5 +43,6 @@ function seismo_corona_loop_length, index, ev
 end
 
 pro seismo_corona_routines
+compile_opt idl2
 
 end

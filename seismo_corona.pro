@@ -1,4 +1,5 @@
 pro seismo_corona
+compile_opt idl2
 common seismo_corona, global
 compile_opt idl2
   global = hash()
