@@ -10,7 +10,7 @@
 ;-
 function seismo_corona_form
 compile_opt idl2
-  base = WIDGET_BASE( xsize = 1000, ysize = 700, /row, mbar = bar, title = 'Seismo corona')
+  base = WIDGET_BASE( xsize = 1000, ysize = 750, /row, mbar = bar, title = 'Seismo corona')
   menu_file = WIDGET_BUTTON(bar, VALUE='file', /MENU)
     button_open   = WIDGET_BUTTON(menu_file, VALUE='Open...', event_pro = 'seismo_corona_open')
     button_save   = WIDGET_BUTTON(menu_file, VALUE='Save...', event_pro = 'seismo_corona_save')
@@ -25,8 +25,12 @@ compile_opt idl2
   
   draw_sun = WIDGET_text(left_panel, uname = 'status_text', value = 'No data loaded')
   
-  draw_sun = WIDGET_DRAW(left_panel, xsize = 800, ysize = 600)
-  frame_selector = widget_slider(left_panel, uname = 'frame_selector', event_pro = 'seismo_corona_plot_frame')
+  tabs = widget_tab(left_panel)
+  image_view = widget_base(tabs,/column, title = 'Image View')
+  td_view = widget_base(tabs,/column, title = 'Time-distance View')
+  
+  draw_sun = WIDGET_DRAW(image_view, xsize = 800, ysize = 600)
+  frame_selector = widget_slider(image_view, uname = 'frame_selector', event_pro = 'seismo_corona_plot_frame')
   
   button_add = widget_button(right_panel, xsize = 150, value = 'Add loop', event_pro = 'seismo_corona_add_loop')
   button_del = widget_button(right_panel, xsize = 150, value = 'Delete loop', event_pro = 'seismo_corona_delete_loop')
