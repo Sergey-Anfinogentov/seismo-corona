@@ -30,7 +30,7 @@ compile_opt idl2
   td_view = widget_base(tabs,/column, title = 'Time-distance View')
   
   ;content of the image view tab
-  draw_sun = WIDGET_DRAW(image_view, xsize = 800, ysize = 600)
+  draw_sun = WIDGET_DRAW(image_view, xsize = 800, ysize = 600, uname = 'draw_frame')
   frame_selector = widget_slider(image_view, uname = 'frame_selector', event_pro = 'seismo_corona_plot_frame')
   
   ;content of Time-Distance view tab
