@@ -43,7 +43,7 @@ common seismo_corona
   sz = size((global['loops'])[loop_index].data)
   
   slit_selector = widget_info(ev.top, find_by_uname = 'slit_selector')
-  widget_control, slit_selector, SET_SLIDER_MAX = sz[3] - 1
+  widget_control, slit_selector, SET_SLIDER_MAX = sz[2] - 1
 
   seismo_corona_plot_frame, ev
 end
@@ -122,7 +122,7 @@ common seismo_corona
   slit_selector = widget_info(ev.top, find_by_uname = 'slit_selector')
   widget_control, slit_selector, get_value = slit_num
   
-  td = (global['loops'])[loop_index].data[*,*,slit_num]
+  td = reform((global['loops'])[loop_index].data[*,slit_num,*])
   
   draw_td = widget_info(ev.top, find_by_uname = 'draw_td')
   WIDGET_CONTROL, draw_td, GET_VALUE = win
