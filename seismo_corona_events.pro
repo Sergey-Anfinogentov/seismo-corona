@@ -4,6 +4,7 @@ pro seismo_corona_add_loop, ev
   if global['state'] eq 'no data' then retu
   seismo_corona_show_status, ev, 'Click points to select a loop. Right click finalises selection.'
   
+  seismo_corona_plot_frame, ev
   index = (global['index'])[0]
   x_arcsec = hdr2x(index)
   y_arcsec = hdr2y(index)
@@ -16,7 +17,10 @@ pro seismo_corona_add_loop, ev
   
   length = seismo_corona_loop_length(index, ev)
   
+ 
+  
   seismo_corona_plot_frame, ev
+  seismo_corona_plot_td, ev
   seismo_corona_show_status, ev, 'Ready'
 end
 
@@ -33,6 +37,14 @@ end
 pro seismo_corona_select_loop, ev
 compile_opt idl2
 common seismo_corona
+
+  loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
+  loop_index = widget_info(loop_list, /LIST_SELECT)
+  sz = size((global['loops'])[loop_index].data)
+  
+  slit_selector = widget_info(ev.top, find_by_uname = 'slit_selector')
+  widget_control, slit_selector, SET_SLIDER_MAX = sz[3] - 1
+
   seismo_corona_plot_frame, ev
 end
 pro seismo_corona_open, evseismo_corona_show_status, ev, text
@@ -101,7 +113,21 @@ end
 
 pro seismo_corona_plot_td, ev
 compile_opt idl2
-  print, 'Plot TD'
+common seismo_corona
+  if global['loops'].count() eq 0 then return
+  loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
+  loop_index = widget_info(loop_list, /LIST_SELECT)
+  if loop_index lt 0 then loop_index = 0
+  
+  slit_selector = widget_info(ev.top, find_by_uname = 'slit_selector')
+  widget_control, slit_selector, get_value = slit_num
+  
+  td = (global['loops'])[loop_index].data[*,*,slit_num]
+  
+  draw_td = widget_info(ev.top, find_by_uname = 'draw_td')
+  WIDGET_CONTROL, draw_td, GET_VALUE = win
+  wset,win
+  implot, td
 end
 
 pro seismo_corona_save, ev

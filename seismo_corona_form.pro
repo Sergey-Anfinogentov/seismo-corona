@@ -34,7 +34,7 @@ compile_opt idl2
   frame_selector = widget_slider(image_view, uname = 'frame_selector', event_pro = 'seismo_corona_plot_frame')
   
   ;content of Time-Distance view tab
-  draw_td = WIDGET_DRAW(td_view, xsize = 800, ysize = 400)
+  draw_td = WIDGET_DRAW(td_view, xsize = 800, ysize = 400, uname = 'draw_td')
   frame_selector = widget_slider(td_view, uname = 'slit_selector', event_pro = 'seismo_corona_plot_td')
   
   
