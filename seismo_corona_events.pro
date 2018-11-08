@@ -40,7 +40,7 @@ common seismo_corona
 
   loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
   loop_index = widget_info(loop_list, /LIST_SELECT)
-  sz = size((global['loops'])[loop_index].data)
+  sz = size(global['loops', loop_index, 'data'])
   
   slit_selector = widget_info(ev.top, find_by_uname = 'slit_selector')
   widget_control, slit_selector, SET_SLIDER_MAX = sz[2] - 1
@@ -86,12 +86,12 @@ common seismo_corona
   WIDGET_CONTROL, draw_frame, GET_VALUE = win 
   wset,win
   
-  index = (global['index'])[0]
+  index = global['index',0]
   
   x_arcsec = hdr2x(index)
   y_arcsec = hdr2y(index) 
   
-  implot, comprange((global['data'])[*,*,frame_num],/global), x_arcsec, y_arcsec,/iso, $
+  implot, comprange(global['data',*,*,frame_num],/global), x_arcsec, y_arcsec,/iso, $
     xtitle = 'X [arcsec]', ytitle = "Y [arcsec]"
   seismo_corona_plot_loops, ev
 end
@@ -102,12 +102,12 @@ compile_opt idl2
   if global['state'] eq 'no data' then return
   if global['loops'].count() eq 0 then return
   for i =0, global['loops'].count()-1 do begin
-    oplot, (global['loops'])[i].x, (global['loops'])[i].y
+    oplot, global['loops',i,'x'], global['loops',i , 'y']
   endfor
   loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
   loop_index = widget_info(loop_list, /LIST_SELECT)
   if loop_index ge 0 then begin
-    oplot, (global['loops'])[loop_index].x, (global['loops'])[loop_index].y, thick = 2
+    oplot, global['loops',loop_index,'x'], global['loops',loop_index, 'y'], thick = 2
   endif
 end
 
@@ -127,7 +127,7 @@ common seismo_corona
   frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
   widget_control, frame_selector, get_value = frame_num
   
-  td = reform((global['loops'])[loop_index].data[*,slit_num,*])
+  td = reform(global['loops', loop_index, 'data', *, slit_num, *])
   
   draw_td = widget_info(ev.top, find_by_uname = 'draw_td')
   sz = size(td)

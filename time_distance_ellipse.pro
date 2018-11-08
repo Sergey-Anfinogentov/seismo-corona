@@ -77,6 +77,12 @@ function time_distance_ellipse, data, x_data, y_data, frame = frame, points = po
   
   
   oplot, slit_x, slit_y
-
-  return,{x:slit_x,y:slit_y,data:td,x1:x1_data, y1:y1_data, x2:x2_data, y2:y2_data}
+  result = hash()
+  result['x']     = slit_x
+  result['y']     = slit_y
+  result['data']  = td
+  result['x1']    = x1_data
+  result['x2']    = x2_data
+  result['y2']    = y2_data
+  return, result
 end
