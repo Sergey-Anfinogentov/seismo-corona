@@ -83,6 +83,7 @@ function time_distance_ellipse, data, x_data, y_data, frame = frame, points = po
   result['data']  = td
   result['x1']    = x1_data
   result['x2']    = x2_data
+  result['y1']    = y1_data
   result['y2']    = y2_data
   return, result
 end

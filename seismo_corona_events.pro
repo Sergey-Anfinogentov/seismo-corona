@@ -80,9 +80,21 @@ pro seismo_corona_plot_frame, ev
 compile_opt idl2
 common seismo_corona
   if global['state'] eq 'no data' then return
+  
+  ;Read current frame
   frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
   widget_control, frame_selector, get_value = frame_num
   
+  ;Read current slit
+  slit_selector = widget_info(ev.top, find_by_uname = 'slit_selector')
+  widget_control, slit_selector, get_value = slit_num
+  
+  ;reed current loop
+  loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
+  loop_index = widget_info(loop_list, /LIST_SELECT)
+  if loop_index lt 0 then loop_index = 0
+  
+  ;Set graphics output to the correct draw widget
   draw_frame = widget_info(ev.top, find_by_uname = 'draw_frame')
   WIDGET_CONTROL, draw_frame, GET_VALUE = win 
   wset,win
@@ -95,6 +107,12 @@ common seismo_corona
   implot, comprange(global['data',*,*,frame_num],/global), x_arcsec, y_arcsec,/iso, $
     xtitle = 'X [arcsec]', ytitle = "Y [arcsec]"
   seismo_corona_plot_loops, ev
+  
+  if global['loops'].count() gt 0 then begin
+     oplot, [global['loops',loop_index,'x1',slit_num], global['loops',loop_index,'x2',slit_num]], $
+            [global['loops',loop_index,'y1',slit_num], global['loops',loop_index,'y2',slit_num]]
+  endif
+  
 end
 
 pro seismo_corona_plot_loops, ev
@@ -116,6 +134,8 @@ pro seismo_corona_plot_td, ev
 compile_opt idl2
 common seismo_corona
   if global['loops'].count() eq 0 then return
+  
+  ;reed current loop
   loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
   loop_index = widget_info(loop_list, /LIST_SELECT)
   if loop_index lt 0 then loop_index = 0
