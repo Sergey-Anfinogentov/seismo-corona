@@ -119,15 +119,22 @@ common seismo_corona
   loop_index = widget_info(loop_list, /LIST_SELECT)
   if loop_index lt 0 then loop_index = 0
   
+  ;Read current slit
   slit_selector = widget_info(ev.top, find_by_uname = 'slit_selector')
   widget_control, slit_selector, get_value = slit_num
+  
+  ;Read current frame
+  frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
+  widget_control, frame_selector, get_value = frame_num
   
   td = reform((global['loops'])[loop_index].data[*,slit_num,*])
   
   draw_td = widget_info(ev.top, find_by_uname = 'draw_td')
+  sz = size(td)
   WIDGET_CONTROL, draw_td, GET_VALUE = win
   wset,win
-  implot, td, /sample
+  implot, td, /sample, xtitle = "Time [frames]", ytitle = "Distance [pixels]"
+  oplot, [frame_num, frame_num], [0,sz[2] - 1]
 end
 
 pro seismo_corona_save, ev
