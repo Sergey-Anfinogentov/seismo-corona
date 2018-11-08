@@ -41,7 +41,7 @@ compile_opt idl2
   button_add = widget_button(right_panel, xsize = 150, value = 'Add loop', event_pro = 'seismo_corona_add_loop')
   button_del = widget_button(right_panel, xsize = 150, value = 'Delete loop', event_pro = 'seismo_corona_delete_loop')
   
-  list = WIDGET_LIST(right_panel, YSIZE=3, uname = 'loop_list', event_pro = 'seismo_corona_select_loop')
+  list = WIDGET_LIST(right_panel, YSIZE=8, uname = 'loop_list', event_pro = 'seismo_corona_select_loop')
   
   return, base
 end
