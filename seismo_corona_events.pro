@@ -127,7 +127,7 @@ common seismo_corona
   draw_td = widget_info(ev.top, find_by_uname = 'draw_td')
   WIDGET_CONTROL, draw_td, GET_VALUE = win
   wset,win
-  implot, td
+  implot, td, /sample
 end
 
 pro seismo_corona_save, ev
