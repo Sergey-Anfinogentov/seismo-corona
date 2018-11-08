@@ -46,6 +46,7 @@ common seismo_corona
   widget_control, slit_selector, SET_SLIDER_MAX = sz[2] - 1
 
   seismo_corona_plot_frame, ev
+  seismo_corona_plot_td, ev
 end
 pro seismo_corona_open, evseismo_corona_show_status, ev, text
 compile_opt idl2
