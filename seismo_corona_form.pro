@@ -25,7 +25,7 @@ compile_opt idl2
   
   status_text = WIDGET_text(left_panel, uname = 'status_text', value = 'No data loaded')
   
-  tabs = widget_tab(left_panel)
+  tabs = widget_tab(left_panel, event_pro = 'seismo_corona_switch_view')
   image_view = widget_base(tabs,/column, title = 'Image View')
   td_view = widget_base(tabs,/column, title = 'Time-distance View')
   

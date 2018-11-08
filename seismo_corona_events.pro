@@ -137,6 +137,17 @@ common seismo_corona
   oplot, [frame_num, frame_num], [0,sz[2] - 1]
 end
 
+pro  seismo_corona_switch_view, ev
+compile_opt idl2
+common seismo_corona
+  if ev.tab eq 0 then begin ;Image view
+    seismo_corona_plot_frame, ev
+  endif
+  if ev.tab eq 1 then begin ;TD view
+    seismo_corona_plot_td, ev
+  endif
+end
+
 pro seismo_corona_save, ev
 compile_opt idl2
   print, 'save'
