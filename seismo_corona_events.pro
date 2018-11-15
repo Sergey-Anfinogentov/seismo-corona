@@ -60,7 +60,7 @@ end
 pro seismo_corona_import_fits, ev
 compile_opt idl2
 common seismo_corona
-  dir_name = dialog_pickfile(title = 'Select directory with FITs files', /directory, path = '/home/sergey/data/kink_magnetic/limb2')
+  dir_name = dialog_pickfile(title = 'Select directory with FITs files', /directory, path = '~/data/kink_magnetic/limb2')
   message,'Reading data from '+dir_name +' ...', /info
   seismo_corona_show_status, ev, 'Reading data...'
   files = file_search(filepath('*.fits', root_dir = dir_name))
