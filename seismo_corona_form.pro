@@ -42,6 +42,8 @@ compile_opt idl2
   button_del = widget_button(right_panel, xsize = 150, value = 'Delete loop', event_pro = 'seismo_corona_delete_loop')
   
   list = WIDGET_LIST(right_panel, YSIZE=8, uname = 'loop_list', event_pro = 'seismo_corona_select_loop')
+  loop_data = WIDGET_table(right_panel, uname = 'loop_data', ysize =2, xsize = 1,$
+     row_labels = ['Length'], /no_column_headers)
   
   return, base
 end
