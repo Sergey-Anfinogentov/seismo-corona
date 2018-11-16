@@ -47,6 +47,11 @@ common seismo_corona
   
   slit_selector = widget_info(ev.top, find_by_uname = 'slit_selector')
   widget_control, slit_selector, SET_SLIDER_MAX = sz[2] - 1
+  
+ loop_data = widget_info(ev.top, find_by_uname = 'loop_data')
+ length = global['loops',loop_index,'length']
+  widget_control, loop_data, set_value = [{length:length}]
+  
 
   seismo_corona_plot_frame, ev
   seismo_corona_plot_td, ev
