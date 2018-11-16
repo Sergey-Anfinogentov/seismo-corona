@@ -188,14 +188,40 @@ end
 pro  seismo_corona_td_back, ev
   compile_opt idl2
   common seismo_corona
-  print,'td_back'
-
+  
+ ;Read current frame
+  frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
+  widget_control, frame_selector, get_value = frame_num
+  
+  ;Read current frame
+  time_range_selector = widget_info(ev.top, find_by_uname = 'time_range_selector')
+  widget_control, time_range_selector, get_value = td_window
+  
+  n_frames =  n_elements(global['data',0,0,*])
+  
+  new_frame_num = (frame_num - fix(td_window/5))>0
+  widget_control, frame_selector, set_value = new_frame_num
+  seismo_corona_plot_td, ev
+ 
 end
 pro  seismo_corona_td_forward, ev
   compile_opt idl2
   common seismo_corona
-  print,'td_forward'
-
+  
+  ;Read current frame
+  frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
+  widget_control, frame_selector, get_value = frame_num
+  
+  ;Read current frame
+  time_range_selector = widget_info(ev.top, find_by_uname = 'time_range_selector')
+  widget_control, time_range_selector, get_value = td_window
+  
+  n_frames =  n_elements(global['data',0,0,*])
+  
+  new_frame_num = (frame_num + fix(td_window/5))<n_frames
+  widget_control, frame_selector, set_value = new_frame_num
+  seismo_corona_plot_td, ev
+  
 end
 
 pro seismo_corona_save, ev
