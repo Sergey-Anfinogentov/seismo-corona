@@ -156,18 +156,21 @@ common seismo_corona
   frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
   widget_control, frame_selector, get_value = frame_num
   
+  ;Read current frame
+  time_range_selector = widget_info(ev.top, find_by_uname = 'time_range_selector')
+  widget_control, time_range_selector, get_value = td_window
+  
   td = reform(global['loops', loop_index, 'data', *, slit_num, *])
   
   draw_td = widget_info(ev.top, find_by_uname = 'draw_td')
   sz = size(td)
   WIDGET_CONTROL, draw_td, GET_VALUE = win
   
-  td_window = 200l
   xrange = frame_num + [-td_window/2., td_window/2.]
   
   
   wset,win
-  implot, td, /sample, xtitle = "Time [frames]", ytitle = "Distance [pixels]", xrange = xrange
+  implot, td,  xtitle = "Time [frames]", ytitle = "Distance [pixels]", xrange = xrange
   oplot, [frame_num, frame_num], [0,sz[2] - 1]
 end
 

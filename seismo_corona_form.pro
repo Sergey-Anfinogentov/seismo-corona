@@ -31,11 +31,17 @@ compile_opt idl2
   
   ;content of the image view tab
   draw_sun = WIDGET_DRAW(image_view, xsize = 800, ysize = 600, uname = 'draw_frame')
-  frame_selector = widget_slider(image_view, uname = 'frame_selector', event_pro = 'seismo_corona_plot_frame')
+  frame_selector = widget_slider(image_view, uname = 'frame_selector', event_pro = 'seismo_corona_plot_frame',$
+    title = 'Current Frame')
   
   ;content of Time-Distance view tab
   draw_td = WIDGET_DRAW(td_view, xsize = 800, ysize = 400, uname = 'draw_td')
-  frame_selector = widget_slider(td_view, uname = 'slit_selector', event_pro = 'seismo_corona_plot_td')
+  slit_selector = widget_slider(td_view, uname = 'slit_selector', event_pro = 'seismo_corona_plot_td',$
+    title = 'Slit position')
+  time_range_selector = widget_slider(td_view, uname = 'time_range_selector', event_pro = 'seismo_corona_plot_td',$
+    title = 'Time range', minimum = 100, maximum = 900, value = 300)
+  
+  
   
   
   button_add = widget_button(right_panel, xsize = 150, value = 'Add loop', event_pro = 'seismo_corona_add_loop')
