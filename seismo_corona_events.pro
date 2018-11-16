@@ -73,6 +73,14 @@ common seismo_corona
   seismo_corona_show_status, ev, 'Reading data...'
   files = file_search(filepath('*.fits', root_dir = dir_name))
   read_sdo, files, index, data,/use_shared_lib, /uncomp_delete
+  data = float(data)
+  
+  ;normolizing exposure
+  nt = n_elements(files)
+  for i =0, nt -1 do begin
+    data[*,*,i] /= index[i].exptime
+  endfor
+  
   message,'Reading data complete', /info
   sz = size(data)
   global['index'] = temporary(index)
