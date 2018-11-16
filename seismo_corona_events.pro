@@ -161,8 +161,13 @@ common seismo_corona
   draw_td = widget_info(ev.top, find_by_uname = 'draw_td')
   sz = size(td)
   WIDGET_CONTROL, draw_td, GET_VALUE = win
+  
+  td_window = 200l
+  xrange = frame_num + [-td_window/2., td_window/2.]
+  
+  
   wset,win
-  implot, td, /sample, xtitle = "Time [frames]", ytitle = "Distance [pixels]"
+  implot, td, /sample, xtitle = "Time [frames]", ytitle = "Distance [pixels]", xrange = xrange
   oplot, [frame_num, frame_num], [0,sz[2] - 1]
 end
 
