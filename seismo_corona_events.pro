@@ -185,6 +185,19 @@ common seismo_corona
   endif
 end
 
+pro  seismo_corona_td_back, ev
+  compile_opt idl2
+  common seismo_corona
+  print,'td_back'
+
+end
+pro  seismo_corona_td_forward, ev
+  compile_opt idl2
+  common seismo_corona
+  print,'td_forward'
+
+end
+
 pro seismo_corona_save, ev
 compile_opt idl2
   print, 'save'

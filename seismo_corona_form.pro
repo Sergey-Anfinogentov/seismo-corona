@@ -35,7 +35,11 @@ compile_opt idl2
     title = 'Current Frame')
   
   ;content of Time-Distance view tab
-  draw_td = WIDGET_DRAW(td_view, xsize = 800, ysize = 400, uname = 'draw_td')
+  td_base = widget_base(td_view, /row)
+  button_back = widget_button(td_base, value ='<', xsize = 25, event_pro = 'seismo_corona_td_back')
+  draw_td = WIDGET_DRAW(td_base, xsize = 750, ysize = 400, uname = 'draw_td')
+  button_forward = widget_button(td_base, value ='>', xsize = 25, event_pro = 'seismo_corona_td_forward')
+  
   slit_selector = widget_slider(td_view, uname = 'slit_selector', event_pro = 'seismo_corona_plot_td',$
     title = 'Slit position')
   time_range_selector = widget_slider(td_view, uname = 'time_range_selector', event_pro = 'seismo_corona_plot_td',$
