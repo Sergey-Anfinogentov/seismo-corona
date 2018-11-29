@@ -42,7 +42,10 @@ compile_opt idl2
 
 end
 
-function seismo_corona_time_distance_ellipse, data, x_data, y_data, frame = frame, points = points, n_slit = n_slit, current_plot = current_plot
+function seismo_corona_time_distance_ellipse, ev, x_data, y_data, frame = frame, points = points, n_slit = n_slit, current_plot = current_plot
+  compile_opt idl2
+  common seismo_corona  
+  data = global['data']
   sz = size(data)
   nx = sz[1]
   ny = sz[2]
@@ -106,7 +109,7 @@ function seismo_corona_time_distance_ellipse, data, x_data, y_data, frame = fram
     for i =0, n_slit -1 do begin
       td[t,*,i]  = INTERPOLATE(REFORM(DATA[*,*,t]),SLIT_X_px + x_norm*l_norm[i],SLIT_Y_px + y_norm*l_norm[i], CUBIC = -0.5)
     endfor
-    print, t
+    seismo_corona_show_status, ev, "Making time-distance plots... " + strcompress(round(float(t*100.)/float(nt-1)))+'%'
   endfor
   
   x1 = SLIT_X_px + x_norm*l_norm[0]
