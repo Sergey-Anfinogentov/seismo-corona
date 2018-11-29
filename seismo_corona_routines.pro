@@ -8,12 +8,14 @@ compile_opt idl2
 
   wcs = fitshead2wcs(index)
   
+  loadct,3
   seismo_corona_show_status, ev, 'Click at the first footpoint (or between the loop footpoints)'
   cursor,x1,y1,/data,/down
-  plots,x1,y1, psym = 2
+  plots,x1,y1, psym = 2, color =150
   seismo_corona_show_status, ev, 'Click at the second footpoint (orst the loop apex)'
   cursor,x2,y2,/data,/down
-  plots,x2,y2, psym = 2
+  plots,x2,y2, psym = 2, color = 150
+  loadct,0
   
   points = dblarr(2,2)
   points[0,*] = [x1,x2] & points[1,*] = [y1,y2]
@@ -61,7 +63,9 @@ function seismo_corona_time_distance_ellipse, ev, x_data, y_data, frame = frame,
   
   if not keyword_set(frame) then frame = 0
   if not keyword_set(current_plot) then implot,comprange(data[*,*,frame]),/iso
-  if not keyword_set(points) then points = click_points()
+  loadct, 3
+  if not keyword_set(points) then points = click_points(color = 150)
+  loadct, 0
   ell = fit_ellipse_2d(points)
   n_ell = n_elements(ell.x)
   ; distance between nodes
