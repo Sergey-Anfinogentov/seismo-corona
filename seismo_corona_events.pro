@@ -9,7 +9,7 @@ pro seismo_corona_add_loop, ev
   x_arcsec = hdr2x(index)
   y_arcsec = hdr2y(index)
   
-  loop = time_distance_ellipse(global['data'], x_arcsec, y_arcsec, /current_plot)
+  loop = seismo_corona_time_distance_ellipse(global['data'], x_arcsec, y_arcsec, /current_plot)
 
   
   length = seismo_corona_loop_length(index, ev)
