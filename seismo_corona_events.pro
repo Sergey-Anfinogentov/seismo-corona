@@ -236,7 +236,24 @@ pro  seismo_corona_td_forward, ev
 end
 
 pro seismo_corona_fit_oscillation, ev
-
+compile_opt idl2
+common seismo_corona
+  ;reed current loop
+  loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
+  loop_index = widget_info(loop_list, /LIST_SELECT)
+  if loop_index lt 0 then loop_index = 0
+  
+  ;Read current slit
+  slit_selector = widget_info(ev.top, find_by_uname = 'slit_selector')
+  widget_control, slit_selector, get_value = slit_num
+  
+  td = reform(global['loops', loop_index, 'data', *, slit_num, *])
+  
+  seismo_corona_measure_loop_position, ev, td, time, centre,sigma, amplitude
+  
+  y_fit = fit_decayless(time, centre,  params = params, credible_intervals = credible_intervals, samples = samples)
+  oplot,time, y_fit
+  stop
 end
 
 pro seismo_corona_save, ev

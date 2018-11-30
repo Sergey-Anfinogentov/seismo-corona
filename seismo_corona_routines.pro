@@ -139,6 +139,172 @@ function seismo_corona_time_distance_ellipse, ev, x_data, y_data, frame = frame,
   return, result
 end
 
+function loop_profile, x, p
+  n_poly =2
+  Amplitude = p[0]
+  centre =p[1]
+  sigma = p[2]
+  c_bg = p[3:3+n_poly-1]
+  
+  background = poly(x, c_bg)
+  loop =amplitude * exp(-((x-centre)/sigma)^2)
+  
+  return, background + loop
+  
+end
+
+pro fit_loop_profile, x, profile, centre, sigma, amplitude
+  nx = n_elements(x)
+  n_poly = 5
+  start_amplitude =(max(profile) - min(profile))*0.8d
+  start_centre = x[nx/2]
+  start_sigma = 1d
+  start_bg =replicate(0d,n_poly)
+  start_bg[0] = median(profile)
+  
+  start_params = [start_amplitude, start_centre, start_sigma, start_bg]
+  
+  par_info = replicate({value:0d,fixed:0,limited:[1,1],limits:[0d,1d]},3+n_poly)
+  par_info.value = start_params
+  par_info[0].limits = [0d,max(profile) - min(profile)]
+  par_info[1].limits = minmax(x)
+  par_info[2].limits = [1d,(max(x)-min(x))*0.5d]
+  for i = 3, 3+n_poly-1 do par_info[i].limited = [0,0]
+  
+  fit_par = mpfitfun('loop_profile',x,profile, error,parinfo = par_info, weights = 1d, /quiet)
+  
+  centre = fit_par[1]
+  sigma = fit_par[2]
+  amplitude = fit_par[0]
+  
+end
+
+
+
+pro track_loop, xfit,yfit, n_poly = n_poly
+  if not keyword_set(n_poly) then n_poly =1
+  
+  x=0.
+  y=0.
+  print,'Use mouse to mark an oscillating loop. Click right button when finish'
+  for i=0, 50 do begin
+  
+    cursor,x0,y0,/data,/down
+    if !MOUSE.button eq 4 then break
+    x=[x,x0]
+    y=[y,y0]
+    oplot,[x0],[y0],psym=1, color = 255
+    
+  endfor
+  
+  
+  x=x[1:*]
+  y=y[1:*]
+  ; sort clicked points
+  ind=sort(x)
+  x=x[ind]
+  y=y[ind]
+  
+  a=mean(abs((y-shift(y,1))[1:*]))*0.5
+  yl=0.5*((y+shift(y,1))[1:*])
+  xl=0.5*((x+shift(x,1))[1:*])
+  
+  n_poly = (n_elements(x) - 2)<2
+  
+  if n_elements(x) le 3 then c = linfit(x,y) else  c=poly_fit(xl,yl,n_poly)
+  max_x = max(x)
+  min_x = min(x)
+  nx = max_x - min_x + 1
+  xx=findgen(nx)/nx*(max(x)-min(x))+min(x)
+  xfit = xx
+  yfit=poly(xx,c)
+end
+
+
+
+;+
+; :Description:
+;    Interactively measure positions of a coronal loop in time-distance map by fitting
+;    a Gausian to the intencity profile at each instant of time
+;
+; :Usage:
+;   IDL> measure_loop_position, td , time, centre, sigma, amplitude
+;   A time-distance map will be plotted in the current window
+;   Click some points with the left mouse button on the loop profile visible in the
+;   time-distance map. Minimum 2 points should be clicked.
+;   Click the right mouse button when finis.
+;
+; :Params:
+;    td_map - (input) an arrayt containing time-distance map to analyse (can be constructed
+;             using a long slit crossing multiple loops a long slit)
+;    time - (output) time coordinate of the fitted loop positions
+;    centre - (output) fitted loop positions
+;    sigma - (output) a width of the gaussian fitted to the intensity profile
+;    amplitude - (output) amplitude of the Gaussian fitted to the intensity profile
+;
+;
+;
+; :Author: Sergey Anfinogentov (sergey.istp@gmail.com)
+;-
+pro seismo_corona_measure_loop_position, ev, td_map, time, centre,sigma, amplitude
+  compile_opt idl2
+  common seismo_corona
+
+  ;half length of the profile to fit [pixels]
+  x_width = 15
+  
+  ;polynomial degree to fit the points putted by hand to track slow motions of the loop
+  
+  sz=size(td_map)
+  
+  ; window,xsi = 800,ysi = 400
+  sz = size(td_map)
+  x = findgen(sz[2]) ;* dx
+  t = findgen(sz[1]) ;* dt
+  
+  ;
+  
+  
+  ;2 or 3 clicks -> linear fit
+  ;more than 3 clicks -> polynomial fitmeasure_loop_position, td_map, time, centre,sigma, amplitud
+  ;
+  track_loop,t_loop, x_loop,n_poly = n_poly
+  
+  oplot, t_loop, x_loop
+  tran = round(minmax(t_loop))
+  nt = tran[1] - tran[0]+1
+  
+  centre = dblarr(nt)
+  time = dindgen(nt)+tran[0]
+  sigma = centre
+  error = centre
+  amplitude =centre
+  
+  for i= 0, nt -1d do begin
+  
+    xst = (x_loop[i] - x_width); > 0
+    xen = (x_loop[i] + x_width); < ((size(data))[2]-1)
+    x_coord = findgen(xen-xst+1)+xst
+    profile = interpolate(td_map,replicate(time[i],xen-xst+1),x_coord);td_map[t_loop[i], xst:xen]
+    
+    
+    ; revert the profile is the loop looks dark
+    ;if abs(min(profile)) gt abs(max(profile)) then profile *= -1
+    
+    ;fit loop profile with gaussian
+    fit_loop_profile, x_coord, profile, centre_i, sigma_i, amplitude_i
+    sigma[i]=sigma_i
+    centre[i]=centre_i
+    ;error[i]=error_i
+    amplitude[i]=amplitude_i
+  endfor
+  
+  oplot,time, centre, psym =1, color = 0
+  
+  
+end
+
+
 pro seismo_corona_routines
 compile_opt idl2
 
