@@ -185,11 +185,14 @@ end
 pro  seismo_corona_switch_view, ev
 compile_opt idl2
 common seismo_corona
+  fit_osc = widget_info(ev.top, find_by_uname = 'fit_osc')
   if ev.tab eq 0 then begin ;Image view
     seismo_corona_plot_frame, ev
+    widget_control, fit_osc, sensitive = 0
   endif
   if ev.tab eq 1 then begin ;TD view
-    seismo_corona_plot_td, ev
+    seismo_corona_plot_td, ev 
+    widget_control, fit_osc, sensitive = 1
   endif
 end
 
@@ -230,6 +233,10 @@ pro  seismo_corona_td_forward, ev
   widget_control, frame_selector, set_value = new_frame_num
   seismo_corona_plot_td, ev
   
+end
+
+pro seismo_corona_fit_oscillation, ev
+
 end
 
 pro seismo_corona_save, ev

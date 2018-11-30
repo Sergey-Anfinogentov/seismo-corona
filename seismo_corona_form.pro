@@ -54,6 +54,9 @@ compile_opt idl2
   list = WIDGET_LIST(right_panel, YSIZE=8, uname = 'loop_list', event_pro = 'seismo_corona_select_loop')
   loop_data = WIDGET_table(right_panel, uname = 'loop_data', ysize =2, xsize = 1,$
      row_labels = ['Length'], /no_column_headers)
+     
+  button_fit_oscillation= widget_button(right_panel, xsize = 150, value = 'Fit oscillation',$
+     event_pro = 'seismo_corona_fit_oscillation', sensitive = 0, uname = 'fit_osc')
   
   return, base
 end
