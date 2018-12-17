@@ -1,3 +1,56 @@
+function osc_spline_trend, x, period, phi, tstart, trend_y, trend_x = trend_x
+  omega = 2.d*!dpi/period
+  t_shift = tstart - (phi -!pi)/omega
+  n_trend_x = n_elements(trend_y) - 2
+  trend_x = dindgen(n_trend_x)*period + t_shift
+  ind = where(trend_x lt x[-1])
+  trend_x = trend_x[ind]
+  trend_x = [x[0],trend_x,x[-1]]
+  n = n_elements(trend_x)
+  return,spline(trend_x, trend_y[0:n-1], x)
+end
+function osc_decayless, t, a,_extra = _extra
+  common trend_par, n_trend
+  travel_time = a[0]
+  amp1 = a[1]
+  displ =a[2]
+  trend_y = a[3:3+n_trend - 1]
+  tstart = t[0]
+  tosc=t-tstart
+  period1 = travel_time/1d
+  omega1 = 2.d*!dpi/period1
+  phi = asin((displ))
+  sinusoid1=amp1*sin(omega1*tosc +phi)
+  trend = osc_spline_trend(t, period1, phi, tstart, trend_y, trend_x = trend_x)
+  return, sinusoid1 + trend
+end
+function fit_decayless, t, y, params = params, credible_intervals = credible_intervals, samples = samples
+  common trend_par
+  n_trend = 4
+  max_period = (t[-1] - t[0])*0.5
+  period_limits = reform([2d, max_period], 1, 2)
+  ampl_limits = reform([0.01d, 10d], 1, 2)
+  displ_limits = reform([-1d,1d], 1, 2)
+
+  trend_limits = minmax(y)
+  ;trend_limits += (trend_limits[1] - trend_limits[0])*[-0.9, 0.9]
+  trend_limits = rebin(reform(trend_limits,1, 2 ), n_trend, 2)
+
+  limits = [period_limits, ampl_limits, displ_limits, trend_limits]
+  limits0 = limits
+
+  model = 'osc_decayless'
+  y_fit = mcmc_fit(t, y, a, limits, model, n_samples = 200000l,$
+    burn_in = 100000l, samples = samples, ppd_samples = ppd_samples, values = values,credible_intervals = credible_intervals)
+
+  params = a
+
+
+  return, y_fit
+
+end
+
+
 function seismo_corona_read_data, file_name
 compile_opt idl2
 
