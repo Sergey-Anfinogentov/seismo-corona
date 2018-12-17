@@ -2,6 +2,7 @@ pro seismo_corona
 compile_opt idl2
 common seismo_corona, global
 compile_opt idl2
+  widget_control, default_font = 'r24'
   global = hash()
   global['state'] = 'no data'
   global['loops'] = list()
