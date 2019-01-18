@@ -45,6 +45,9 @@ scal =2
     title = 'Slit position')
   time_range_selector = widget_slider(td_view, uname = 'time_range_selector', event_pro = 'seismo_corona_plot_td',$
     title = 'Time range', minimum = 100*scal, maximum = 900*scal, value = 300*scal)
+  time_range_selector = widget_slider(td_view, uname = 'slit_width_selector', event_pro = 'seismo_corona_plot_td',$
+    title = 'Slit width', minimum = 1, maximum = 30, value = 1)  
+    
   
   
   

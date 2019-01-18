@@ -160,6 +160,11 @@ common seismo_corona
   slit_selector = widget_info(ev.top, find_by_uname = 'slit_selector')
   widget_control, slit_selector, get_value = slit_num
   
+  
+  ;Read slit width
+  slit_width_selector = widget_info(ev.top, find_by_uname = 'slit_width_selector')
+  widget_control, slit_width_selector, get_value = slit_width
+  
   ;Read current frame
   frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
   widget_control, frame_selector, get_value = frame_num
@@ -168,7 +173,16 @@ common seismo_corona
   time_range_selector = widget_info(ev.top, find_by_uname = 'time_range_selector')
   widget_control, time_range_selector, get_value = td_window
   
-  td = reform(global['loops', loop_index, 'data', *, slit_num, *])
+  if slit_width eq 1 then begin
+    td = reform(global['loops', loop_index, 'data', *, slit_num, *])
+  endif else begin
+    w_2 = (slit_width-1)/2
+    sz = size(global['loops', loop_index, 'data'])
+    slit_st = (slit_num - w_2)>0
+    slit_en = (slit_num + w_2)<(sz[2]-1)
+    tmp = total(global['loops', loop_index, 'data', *, slit_st:slit_en, *],2)
+    td = reform(tmp)
+  endelse
   
   draw_td = widget_info(ev.top, find_by_uname = 'draw_td')
   sz = size(td)
