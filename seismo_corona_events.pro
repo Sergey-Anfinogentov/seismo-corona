@@ -253,7 +253,7 @@ common seismo_corona
   
   y_fit = fit_decayless(time, centre,  params = params, credible_intervals = credible_intervals, samples = samples)
   oplot,time, y_fit
-  stop
+;  stop
 end
 
 pro seismo_corona_save, ev
