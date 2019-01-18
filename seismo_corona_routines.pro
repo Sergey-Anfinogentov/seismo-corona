@@ -56,6 +56,22 @@ compile_opt idl2
 
 end
 
+function seismo_corona_get_td, loop_index, slit_num, slit_width
+compile_opt idl2
+common seismo_corona 
+     
+  if slit_width eq 1 then begin
+    td = reform(global['loops', loop_index, 'data', *, slit_num, *])
+  endif else begin
+    w_2 = (slit_width-1)/2
+    length = n_elements(global['loops', loop_index, 'data',0,*,0])&
+    slit_st = (slit_num - w_2)>0
+    slit_en = (slit_num + w_2)<(length-1)
+    td = total(global['loops', loop_index, 'data', *, slit_st:slit_en, *],2)
+  endelse
+  return, td
+end
+
 function seismo_corona_loop_length, index, ev
 compile_opt idl2
 
