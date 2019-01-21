@@ -58,13 +58,14 @@ common seismo_corona
   seismo_corona_plot_frame, ev
   seismo_corona_plot_td, ev
 end
-pro seismo_corona_open, evseismo_corona_show_status, ev, text
+pro seismo_corona_open,  ev, text
 compile_opt idl2
 common seismo_corona
-  print, 'Open event fired'
-  file_name = dialog_pickfile(title = 'Select save file with data')
-  print, 'readind data from '+ file_name
-  restore, file_name,/v
+  file =dialog_pickfile(filter = '*.prj.sav', title = 'Select file with saved project')
+  seismo_corona_show_status, ev, "Reading.."
+  restore, file
+  seismo_corona_show_status, ev, "Ready"
+  seismo_corona_plot_frame, ev
 end
 
 pro seismo_corona_import_fits, ev
@@ -284,11 +285,16 @@ end
 
 pro seismo_corona_save, ev
 compile_opt idl2
-  print, 'save'
+common seismo_corona
+   file = dialog_pickfile(DEFAULT_EXTENSION = 'prj.sav', title = 'Select file where to save current project')
+   seismo_corona_show_status, ev, "Saving data.."
+   save,global, file = file
+   seismo_corona_show_status, ev, "Ready"
+   
 end
 pro seismo_corona_close, ev
 compile_opt idl2
-  print, 'close'
+ 
 end
 pro seismo_corona_export_oscillation, ev
 compile_opt idl2
