@@ -293,12 +293,14 @@ end
 pro seismo_corona_export_oscillation, ev
 compile_opt idl2
 common seismo_corona
-  print, 'export oscillation'
+  loop_index = seismo_corona_get_current_loop(ev)
+  oscillation = global['loops',loop_index,'oscillation']
+  save,oscillation, file = dialog_pickfile(DEFAULT_EXTENSION = 'osc.sav', title = 'Select file where to save oscillation data')
+
 end
 pro seismo_corona_export_loop, ev
 compile_opt idl2
 common seismo_corona
-  print, 'export loop data'
   loop_index = seismo_corona_get_current_loop(ev)
   loop = global['loops',loop_index]
   save,loop, file = dialog_pickfile(DEFAULT_EXTENSION = 'loop.sav', title = 'Select file where to save loop data')
