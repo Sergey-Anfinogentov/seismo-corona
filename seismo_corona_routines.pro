@@ -383,6 +383,21 @@ pro seismo_corona_measure_loop_position, ev, td_map, time, centre,sigma, amplitu
   
 end
 
+function seismo_corona_get_curent_loop, ev
+compile_opt idl2
+common seismo_corona
+  loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
+  loop_index = widget_info(loop_list, /LIST_SELECT)
+  if loop_index lt 0 then loop_index = 0
+  return, loop_index
+end
+
+pro seismo_corona_set_curent_loop, ev, loop_index
+  compile_opt idl2
+  common seismo_corona
+  loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
+   widget_control, loop_list, SET_LIST_SELECT = loop_index
+end
 
 pro seismo_corona_routines
 compile_opt idl2
