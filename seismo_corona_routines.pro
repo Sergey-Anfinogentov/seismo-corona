@@ -396,6 +396,8 @@ pro seismo_corona_set_curent_loop, ev, loop_index
   compile_opt idl2
   common seismo_corona
   loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
+  loop_count = global['loops'].count()
+  widget_control, loop_list, set_value = 'loop '+ strcompress(indgen(loop_count),/remove_all)
    widget_control, loop_list, SET_LIST_SELECT = loop_index
 end
 

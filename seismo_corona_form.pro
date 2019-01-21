@@ -61,7 +61,7 @@ scal =2
   
   list = WIDGET_LIST(right_panel, YSIZE=8, uname = 'loop_list', event_pro = 'seismo_corona_select_loop')
   loop_data = WIDGET_table(right_panel, uname = 'loop_data', ysize =6, xsize = 1,$
-     row_labels = ['Length'], column_width = [100]*scal, row_heights = 20*scal,SCR_XSIZE =150*scal,/RESIZEABLE_COLUMNS,$
+     row_labels = ['Length','Period','A.speed'], column_width = [100]*scal, row_heights = 20*scal,SCR_XSIZE =150*scal,/RESIZEABLE_COLUMNS,$
      COLUMN_LABELS = ['Param', 'Value'])
      
   button_fit_oscillation= widget_button(right_panel, xsize = 150*scal, value = 'Fit oscillation',$

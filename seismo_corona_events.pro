@@ -19,7 +19,6 @@ pro seismo_corona_add_loop, ev
   global['loops'].Add, loop
   loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
   loop_count = global['loops'].count()
-  widget_control, loop_list, set_value = 'loop '+ strcompress(indgen(loop_count),/remove_all)
   
   seismo_corona_set_curent_loop, ev, loop_count - 1
   seismo_corona_select_loop, ev
@@ -39,7 +38,7 @@ end
 pro seismo_corona_select_loop, ev
 compile_opt idl2
 common seismo_corona
-
+  dt = 12d
   loop_index = seismo_corona_get_current_loop(ev)
   
   sz = size(global['loops', loop_index, 'data'])
@@ -49,7 +48,19 @@ common seismo_corona
   
  loop_data = widget_info(ev.top, find_by_uname = 'loop_data')
  length = global['loops',loop_index,'length']
-  widget_control, loop_data, set_value = [{length:length}]
+  
+  info = strarr(1,3)
+  info[*,0] = strcompress(round(length))+' Mm'
+  
+  if global['loops',loop_index].haskey('oscillation') then begin
+    period = dt*global['loops',loop_index,'oscillation','period']
+    info[*,1] = strcompress(round(period))+' s'
+    ca =  2d*length*1d3/period
+    info[*,2] = strcompress(round(ca))+' km/s'
+  endif
+ 
+
+  widget_control, loop_data, set_value = info
   
 
   seismo_corona_plot_frame, ev
@@ -58,11 +69,14 @@ end
 pro seismo_corona_open,  ev, text
 compile_opt idl2
 common seismo_corona
-  file =dialog_pickfile(filter = '*.prj.sav', title = 'Select file with saved project')
+  file =dialog_pickfile(filter = '*.prj.sav', title = 'Select file with saved project',$
+  path = '~/data/kink_magnetic/limb2')
   seismo_corona_show_status, ev, "Reading.."
   restore, file
+  seismo_corona_set_curent_loop, ev, 0
+  seismo_corona_select_loop, ev
   seismo_corona_show_status, ev, "Ready"
-  seismo_corona_plot_frame, ev
+
 end
 
 pro seismo_corona_import_fits, ev
@@ -271,7 +285,7 @@ common seismo_corona
   oscillation['time']=time
   oscillation['centre'] = centre
   oscillation['sigma'] = sigma
-  oscillation['period'] = pariod
+  oscillation['period'] = period
   oscillation['amplitude'] = amplitude
   oscillation['mcmc'] =mcmc
   global['loops', loop_index, 'oscillation'] = oscillation
@@ -283,7 +297,8 @@ end
 pro seismo_corona_save, ev
 compile_opt idl2
 common seismo_corona
-   file = dialog_pickfile(DEFAULT_EXTENSION = 'prj.sav', title = 'Select file where to save current project')
+   file = dialog_pickfile(DEFAULT_EXTENSION = 'prj.sav', title = 'Select file where to save current project',$
+  path = '~/data/kink_magnetic/limb2')
    seismo_corona_show_status, ev, "Saving data.."
    save,global, file = file
    seismo_corona_show_status, ev, "Ready"
