@@ -250,18 +250,40 @@ common seismo_corona
   
   ;Read current slit
   slit_selector = widget_info(ev.top, find_by_uname = 'slit_selector')
-  widget_control, slit_selector, get_value = slit_num
+  widget_control, slit_selector, get_value = slit_index
   
   ;Read slit width
   slit_width_selector = widget_info(ev.top, find_by_uname = 'slit_width_selector')
   widget_control, slit_width_selector, get_value = slit_width
   
-  td =  seismo_corona_get_td(loop_index, slit_num, slit_width)
+  td =  seismo_corona_get_td(loop_index, slit_index, slit_width)
   
   seismo_corona_measure_loop_position, ev, td, time, centre,sigma, amplitude
   
-  y_fit = fit_decayless(time, centre,  params = params, credible_intervals = credible_intervals, samples = samples)
-  oplot,time, y_fit
+  mcmc = fit_decayless(time, centre,  params = params, credible_intervals = credible_intervals, samples = samples)
+  oplot,time, mcmc['fit']
+  
+  ;updating loop data
+  
+  ind = where(mcmc['parnames'] eq 'period')
+  period = mcmc['estimate',ind]
+  
+  ind = where(mcmc['parnames'] eq 'amplitude')
+  amplitude = mcmc['estimate',ind]
+  
+  oscillation = hash()
+  oscillation['td'] = td
+  oscillation['slit_index'] = slit_index
+  oscillation['slit_width'] = slit_width
+  oscillation['time']=time
+  oscillation['centre'] = centre
+  oscillation['sigma'] = sigma
+  oscillation['period'] = pariod
+  oscillation['amplitude'] = amplitude
+  oscillation['mcmc'] =mcmc
+  global['loops', loop_index, 'oscillation'] = oscillation
+  
+  
 ;  stop
 end
 

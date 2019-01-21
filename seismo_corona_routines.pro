@@ -9,8 +9,11 @@ function osc_spline_trend, x, period, phi, tstart, trend_y, trend_x = trend_x
   n = n_elements(trend_x)
   return,spline(trend_x, trend_y[0:n-1], x)
 end
-function osc_decayless, t, a,_extra = _extra
+function osc_decayless, t, a,_extra = _extra, get_parnames = get_parnames
   common trend_par, n_trend
+  if keyword_Set(get_parnames) then begin
+    return,['period','amplitude','displacement','trend_'+strcompress(indgen(n_trend),/remove_all)]
+  endif
   travel_time = a[0]
   amp1 = a[1]
   displ =a[2]
@@ -44,9 +47,16 @@ function fit_decayless, t, y, params = params, credible_intervals = credible_int
     burn_in = 100000l, samples = samples, ppd_samples = ppd_samples, values = values,credible_intervals = credible_intervals)
 
   params = a
+  
+  result = hash()
+  result['fit'] = y_fit
+  result['estimate'] = params
+  result['parnames'] = call_function(model,/get_parnames)
+  result['credible_intervals'] = credible_intervals
+  result['samples'] = samples
+  result['p_values'] = values
 
-
-  return, y_fit
+  return, result
 
 end
 
