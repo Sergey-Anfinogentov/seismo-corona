@@ -43,7 +43,7 @@ pro seismo_corona_select_loop, ev
 compile_opt idl2
 common seismo_corona
 
-  loop_index = seismo_corona_get_curent_loop(ev)
+  loop_index = seismo_corona_get_current_loop(ev)
   
   sz = size(global['loops', loop_index, 'data'])
   
@@ -108,7 +108,7 @@ common seismo_corona
   widget_control, slit_selector, get_value = slit_num
   
   ;reed current loop
-  loop_index = seismo_corona_get_curent_loop(ev)
+  loop_index = seismo_corona_get_current_loop(ev)
   
   ;Set graphics output to the correct draw widget
   draw_frame = widget_info(ev.top, find_by_uname = 'draw_frame')
@@ -139,8 +139,7 @@ compile_opt idl2
   for i =0, global['loops'].count()-1 do begin
     oplot, global['loops',i,'x'], global['loops',i , 'y']
   endfor
-  loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
-  loop_index = widget_info(loop_list, /LIST_SELECT)
+  loop_index = seismo_corona_get_current_loop(ev)
   if loop_index ge 0 then begin
     oplot, global['loops',loop_index,'x'], global['loops',loop_index, 'y'], thick = 2
   endif
@@ -152,7 +151,7 @@ common seismo_corona
   if global['loops'].count() eq 0 then return
   
   ;reed current loop
-  loop_index = seismo_corona_get_curent_loop(ev)
+  loop_index = seismo_corona_get_current_loop(ev)
   
   ;Read current slit
   slit_selector = widget_info(ev.top, find_by_uname = 'slit_selector')
@@ -242,7 +241,7 @@ pro seismo_corona_fit_oscillation, ev
 compile_opt idl2
 common seismo_corona
   ;reed current loop
-  loop_index = seismo_corona_get_curent_loop(ev)
+  loop_index = seismo_corona_get_current_loop(ev)
   
   ;Read current slit
   slit_selector = widget_info(ev.top, find_by_uname = 'slit_selector')
@@ -298,6 +297,7 @@ end
 pro seismo_corona_export_loop, ev
   compile_opt idl2
   print, 'export loop data'
+  loop_index = seismo_corona_get_current_loop(ev)
 end
 pro seismo_corona_cleanup, ev
 compile_opt idl2
