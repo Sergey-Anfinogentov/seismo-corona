@@ -22,10 +22,7 @@ pro seismo_corona_add_loop, ev
   widget_control, loop_list, set_value = 'loop '+ strcompress(indgen(loop_count),/remove_all)
   
   seismo_corona_set_curent_loop, ev, loop_count - 1
- 
-  
-  seismo_corona_plot_frame, ev
-  seismo_corona_plot_td, ev
+  seismo_corona_select_loop, ev
   seismo_corona_show_status, ev, 'Ready'
 end
 
