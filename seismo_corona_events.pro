@@ -73,6 +73,9 @@ common seismo_corona
   path = '~/data/kink_magnetic/limb2')
   seismo_corona_show_status, ev, "Reading.."
   restore, file
+  frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
+  sz = size(global["data"])
+  widget_control, frame_selector, SET_SLIDER_MAX = sz[3] - 1
   seismo_corona_set_curent_loop, ev, 0
   seismo_corona_select_loop, ev
   seismo_corona_show_status, ev, "Ready"
