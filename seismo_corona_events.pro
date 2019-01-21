@@ -197,19 +197,37 @@ common seismo_corona
   wset,win
   implot, td,  xtitle = "Time [frames]", ytitle = "Distance [pixels]", xrange = xrange
   oplot, [frame_num, frame_num], [0,sz[2] - 1]
+  
+  switch_plot_osc = widget_info(ev.top, find_by_uname = 'switch_plot_osc')
+  
+  plot_fit = widget_info(switch_plot_osc, /button_set)
+  if plot_fit and global['loops',loop_index].haskey('oscillation') then begin
+    t = global['loops',loop_index,'oscillation','time']
+    c = global['loops',loop_index,'oscillation','centre']
+    fit = global['loops',loop_index,'oscillation','mcmc','fit']
+    loadct,3
+    oplot, t, c, psym = 1, color = 128
+    loadct,8
+    oplot, t, fit, color = 128
+    loadct,0
+  endif
+  
 end
 
 pro  seismo_corona_switch_view, ev
 compile_opt idl2
 common seismo_corona
   fit_osc = widget_info(ev.top, find_by_uname = 'fit_osc')
+  switch_plot_osc = widget_info(ev.top, find_by_uname = 'switch_plot_osc')
   if ev.tab eq 0 then begin ;Image view
     seismo_corona_plot_frame, ev
     widget_control, fit_osc, sensitive = 0
+    widget_control, switch_plot_osc, sensitive = 0
   endif
   if ev.tab eq 1 then begin ;TD view
     seismo_corona_plot_td, ev 
     widget_control, fit_osc, sensitive = 1
+    widget_control, switch_plot_osc, sensitive = 1
   endif
 end
 

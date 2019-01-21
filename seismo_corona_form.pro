@@ -66,6 +66,10 @@ scal =2
      
   button_fit_oscillation= widget_button(right_panel, xsize = 150*scal, value = 'Fit oscillation',$
      event_pro = 'seismo_corona_fit_oscillation', sensitive = 0, uname = 'fit_osc')
+     
+  checkbox_base = widget_base(right_panel, /nonexclusive, /column)   
+  button_plot_oscillation= widget_button(checkbox_base, xsize = 150*scal, value = 'Plot oscillation',$
+      event_pro="seismo_corona_plot_td", sensitive = 0, uname = 'switch_plot_osc')
   
   return, base
 end
