@@ -12,11 +12,15 @@ function seismo_corona_form
 compile_opt idl2
 scal =2
   base = WIDGET_BASE( xsize = 1000*scal, ysize = 750*scal, /row, mbar = bar, title = 'Seismo corona')
-  menu_file = WIDGET_BUTTON(bar, VALUE='file', /MENU)
+  menu_file = WIDGET_BUTTON(bar, VALUE='File', /MENU)
     button_open   = WIDGET_BUTTON(menu_file, VALUE='Open...', event_pro = 'seismo_corona_open')
     button_save   = WIDGET_BUTTON(menu_file, VALUE='Save...', event_pro = 'seismo_corona_save')
     button_close  = WIDGET_BUTTON(menu_file, VALUE='Close',   event_pro = 'seismo_corona_close')
     button_import = WIDGET_BUTTON(menu_file, VALUE='Import from FITS..', event_pro = 'seismo_corona_import_fits')
+  menu_file = WIDGET_BUTTON(bar, VALUE='Export', /MENU)
+    button_open   = WIDGET_BUTTON(menu_file, VALUE='Oscillation...', event_pro = 'seismo_corona_export_oscillation')
+    button_open   = WIDGET_BUTTON(menu_file, VALUE='Loop data...', event_pro = 'seismo_corona_export_loop')
+
     
     
     

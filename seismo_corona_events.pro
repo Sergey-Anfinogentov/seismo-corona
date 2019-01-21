@@ -295,7 +295,14 @@ pro seismo_corona_close, ev
 compile_opt idl2
   print, 'close'
 end
-
+pro seismo_corona_export_oscillation, ev
+  compile_opt idl2
+  print, 'export oscillation'
+end
+pro seismo_corona_export_loop, ev
+  compile_opt idl2
+  print, 'export loop data'
+end
 pro seismo_corona_cleanup, ev
 compile_opt idl2
 common seismo_corona
