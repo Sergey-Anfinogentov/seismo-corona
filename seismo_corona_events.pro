@@ -185,6 +185,13 @@ common seismo_corona
   time_range_selector = widget_info(ev.top, find_by_uname = 'time_range_selector')
   widget_control, time_range_selector, get_value = td_window
   
+  ;Read brightness range
+  brightness_range_down_selector = widget_info(ev.top, find_by_uname = 'brightness_range_down_selector')
+  widget_control, brightness_range_down_selector, get_value = limit_down
+  brightness_range_up_selector = widget_info(ev.top, find_by_uname = 'brightness_range_up_selector')
+  widget_control, brightness_range_up_selector, get_value = limit_up
+  
+  
   td =  seismo_corona_get_td(loop_index, slit_num, slit_width)
   
   draw_td = widget_info(ev.top, find_by_uname = 'draw_td')
@@ -192,10 +199,15 @@ common seismo_corona
   WIDGET_CONTROL, draw_td, GET_VALUE = win
   
   xrange = frame_num + [-td_window/2., td_window/2.]
-  
+
+  td_min = min(td)
+  td_max = max(td)
+  range = td_max - td_min
+  limit_down = td_min + range * (limit_down/100d)
+  limit_up = td_min + range * (limit_up/100d)  
   
   wset,win
-  implot, td,  xtitle = "Time [frames]", ytitle = "Distance [pixels]", xrange = xrange
+  implot, td>limit_down<limit_up,  xtitle = "Time [frames]", ytitle = "Distance [pixels]", xrange = xrange
   oplot, [frame_num, frame_num], [0,sz[2] - 1]
   
   switch_plot_osc = widget_info(ev.top, find_by_uname = 'switch_plot_osc')

@@ -50,7 +50,14 @@ scal =2
   time_range_selector = widget_slider(td_view, uname = 'time_range_selector', event_pro = 'seismo_corona_plot_td',$
     title = 'Time range', minimum = 100*scal, maximum = 900*scal, value = 300*scal)
   time_range_selector = widget_slider(td_view, uname = 'slit_width_selector', event_pro = 'seismo_corona_plot_td',$
-    title = 'Slit width', minimum = 1, maximum = 30, value = 1)  
+    title = 'Slit width', minimum = 1, maximum = 30, value = 1)
+  range_base = widget_base(td_view,/row)
+  brightness_range_down_selector = widget_slider(range_base, uname = 'brightness_range_down_selector',$
+     event_pro = 'seismo_corona_plot_td', title = 'brightness threshold low %',$
+      minimum = 0, maximum = 100, value = 0, xsize = 400*scal)
+  brightness_range_up_selector = widget_slider(range_base, uname = 'brightness_range_up_selector',$
+     event_pro = 'seismo_corona_plot_td', title = 'brightness threshold high %',$
+      minimum = 0, maximum = 100, value = 100, xsize = 400*scal)  
     
   
   
