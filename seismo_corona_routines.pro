@@ -234,7 +234,7 @@ end
 
 pro fit_loop_profile, x, profile, centre, sigma, amplitude
   nx = n_elements(x)
-  n_poly = 5
+  n_poly = 2
   start_amplitude =(max(profile) - min(profile))*0.8d
   start_centre = x[nx/2]
   start_sigma = 1d
@@ -246,8 +246,8 @@ pro fit_loop_profile, x, profile, centre, sigma, amplitude
   par_info = replicate({value:0d,fixed:0,limited:[1,1],limits:[0d,1d]},3+n_poly)
   par_info.value = start_params
   par_info[0].limits = [0d,max(profile) - min(profile)]
-  par_info[1].limits = minmax(x)
-  par_info[2].limits = [1d,(max(x)-min(x))*0.5d]
+  par_info[1].limits = start_centre + [-5.,5.];minmax(x)
+  par_info[2].limits = [0.3d,3d];[1d,(max(x)-min(x))*0.5d]
   for i = 3, 3+n_poly-1 do par_info[i].limited = [0,0]
   
   fit_par = mpfitfun('loop_profile',x,profile, error,parinfo = par_info, weights = 1d, /quiet)
@@ -290,13 +290,19 @@ pro track_loop, xfit,yfit, n_poly = n_poly
   
   n_poly = (n_elements(x) - 2)<2
   
-  if n_elements(x) le 3 then c = linfit(x,y) else  c=poly_fit(xl,yl,n_poly)
+  
   max_x = max(x)
   min_x = min(x)
   nx = max_x - min_x + 1
   xx=findgen(nx)/nx*(max(x)-min(x))+min(x)
   xfit = xx
-  yfit=poly(xx,c)
+  if n_elements(x) le 3 then begin
+    c = linfit(x,y) 
+    yfit=poly(xx,c)
+    return
+  endif; else  c=poly_fit(xl,yl,n_poly)
+  yfit = spline(x,y,xx)
+  
 end
 
 
@@ -330,7 +336,7 @@ pro seismo_corona_measure_loop_position, ev, td_map, time, centre,sigma, amplitu
   common seismo_corona
 
   ;half length of the profile to fit [pixels]
-  x_width = 15
+  x_width = 7
   
   ;polynomial degree to fit the points putted by hand to track slow motions of the loop
   

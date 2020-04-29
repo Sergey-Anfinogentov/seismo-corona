@@ -72,7 +72,7 @@ common seismo_corona
   file =dialog_pickfile(filter = '*.prj.sav', title = 'Select file with saved project',$
   path = '~/data/kink_magnetic/limb2')
   seismo_corona_show_status, ev, "Reading.."
-  restore, file
+  restore, file, /RELAXED_STRUCTURE_ASSIGNMENT
   frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
   sz = size(global["data"])
   widget_control, frame_selector, SET_SLIDER_MAX = sz[3] - 1

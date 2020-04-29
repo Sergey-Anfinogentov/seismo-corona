@@ -5,7 +5,7 @@ compile_opt idl2
 resolve_routine,'seismo_corona_routines',/compile_full_file, /either
 resolve_routine,'seismo_corona_form',/compile_full_file, /either
 resolve_routine,'seismo_corona_events',/compile_full_file, /either
-  widget_control, default_font = 'r24'
+  ;widget_control, default_font = 'r24'
   global = hash()
   global['state'] = 'no data'
   global['loops'] = list()

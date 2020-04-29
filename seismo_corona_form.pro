@@ -10,7 +10,7 @@
 ;-
 function seismo_corona_form
 compile_opt idl2
-scal =2
+scal =1
   base = WIDGET_BASE( xsize = 1000*scal, ysize = 750*scal, /row, mbar = bar, title = 'Seismo corona')
   menu_file = WIDGET_BUTTON(bar, VALUE='File', /MENU)
     button_open   = WIDGET_BUTTON(menu_file, VALUE='Open...', event_pro = 'seismo_corona_open')
