@@ -43,7 +43,7 @@ function fit_decayless, t, y, params = params, credible_intervals = credible_int
   limits0 = limits
 
   model = 'osc_decayless'
-  y_fit = mcmc_fit(t, y, a, limits, model, n_samples = 200000l,$
+  y_fit = mcmc_fit(t, y, a, limits = limits, model, n_samples = 200000l,$
     burn_in = 100000l, samples = samples, ppd_samples = ppd_samples, values = values,credible_intervals = credible_intervals)
 
   params = a
@@ -69,15 +69,15 @@ end
 function seismo_corona_get_td, loop_index, slit_num, slit_width
 compile_opt idl2
 common seismo_corona 
-     
+  td_data = shmvar(global['loops', loop_index, 'data_segment'])   
   if slit_width eq 1 then begin
-    td = reform(global['loops', loop_index, 'data', *, slit_num, *])
+    td = reform(td_data[*, slit_num, *])
   endif else begin
     w_2 = (slit_width-1)/2
-    length = n_elements(global['loops', loop_index, 'data',0,*,0])&
+    length = n_elements(td_data[0,*,0])&
     slit_st = (slit_num - w_2)>0
     slit_en = (slit_num + w_2)<(length-1)
-    td = total(global['loops', loop_index, 'data', *, slit_st:slit_en, *],2)
+    td = total(td_data[ *, slit_st:slit_en, *],2)
   endelse
   return, td
 end
@@ -126,7 +126,7 @@ end
 function seismo_corona_time_distance_ellipse, ev, x_data, y_data, frame = frame, points = points, n_slit = n_slit, current_plot = current_plot
   compile_opt idl2
   common seismo_corona  
-  data = global['data']
+  data = shmvar(global['data_segment'])
   sz = size(data)
   nx = sz[1]
   ny = sz[2]
@@ -403,8 +403,47 @@ pro seismo_corona_set_curent_loop, ev, loop_index
   common seismo_corona
   loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
   loop_count = global['loops'].count()
+  if loop_count eq 0 then return
   widget_control, loop_list, set_value = 'loop '+ strcompress(indgen(loop_count),/remove_all)
    widget_control, loop_list, SET_LIST_SELECT = loop_index
+end
+
+pro seismo_corona_load_project,ev, project_dir
+compile_opt idl2
+common seismo_corona
+  
+  index_file = filepath('index.sav', root_dir = project_dir)
+  if not file_test(index_file) then begin
+    message, "Index file '"+index_file+"' not found",/info
+    return
+  endif
+  seismo_corona_cleanup
+  data_dir = filepath('data', root_dir = project_dir)
+  data_file = filepath('images.dat', root_dir = data_dir)
+  
+  if not file_test(data_file) then message, "Images data file '"+data_file+"' not found"
+  restore, index_file
+  global["project_dir"] = project_dir
+  data = mmf_open(data_file, segname = segment)
+  global["data_segment"] = segment
+  sz = size(data)
+  
+  for i = 0, n_elements(global["loops"]) -1 do begin
+    data_file = global["loops", i, "data_file"]
+    data_file = filepath(data_file, root_dir = data_dir)
+    data = mmf_open(data_file, segname = segment)
+    global["loops", i, "data_segment"] = segment
+  endfor
+  
+  frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
+ 
+  widget_control, frame_selector, SET_SLIDER_MAX = sz[3] - 1
+  seismo_corona_set_curent_loop, ev, 0
+  seismo_corona_select_loop, ev
+  seismo_corona_show_status, ev, "Ready"
+  global['state'] = 'data loaded'
+  seismo_corona_plot_frame, ev
+
 end
 
 pro seismo_corona_routines

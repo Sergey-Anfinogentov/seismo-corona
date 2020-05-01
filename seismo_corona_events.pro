@@ -10,11 +10,23 @@ pro seismo_corona_add_loop, ev
   y_arcsec = hdr2y(index)
   
   loop = seismo_corona_time_distance_ellipse(ev, x_arcsec, y_arcsec, /current_plot)
-
+  
+  td = loop["data"]
+  loop.remove,"data"
   
   length = seismo_corona_loop_length(index, ev)
   
   loop['length'] = length
+  
+  loop_num = global['loops'].count() + 1
+  loop_file = "loop"+strcompress(loop_num,/remove_all)+".dat"
+  data_dir = filepath("data",root_dir = global["project_dir"])
+  loop_file = filepath(loop_file, root_dir = data_dir)
+  loop["data_file"] = file_basename(loop_file)
+  sz = size(td)
+  td_mmf = mmf_create(loop_file, sz[1], sz[2],sz[3],/float, segname = segment)
+  td_mmf[*] = temporary(td)
+  loop["data_segment"] = segment
   
   global['loops'].Add, loop
   loop_list = widget_info(ev.top, find_by_uname = 'loop_list')
@@ -40,8 +52,9 @@ compile_opt idl2
 common seismo_corona
   dt = 12d
   loop_index = seismo_corona_get_current_loop(ev)
-  
-  sz = size(global['loops', loop_index, 'data'])
+  if n_elements(global['loops']) eq 0 then return
+  td = shmvar(global['loops', loop_index, 'data_segment'])
+  sz = size(td)
   
   slit_selector = widget_info(ev.top, find_by_uname = 'slit_selector')
   widget_control, slit_selector, SET_SLIDER_MAX = sz[2] - 1
@@ -73,8 +86,11 @@ common seismo_corona
   path = '~/data/kink_magnetic/limb2')
   seismo_corona_show_status, ev, "Reading.."
   restore, file, /RELAXED_STRUCTURE_ASSIGNMENT
+  data_file = str_replace(file,".sav",".dat")
+  data = mmf_open(data_file, segname=segment)
+  global["data_segment"] = segment
   frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
-  sz = size(global["data"])
+  sz = size(data)
   widget_control, frame_selector, SET_SLIDER_MAX = sz[3] - 1
   seismo_corona_set_curent_loop, ev, 0
   seismo_corona_select_loop, ev
@@ -85,23 +101,30 @@ end
 pro seismo_corona_import_fits, ev
 compile_opt idl2
 common seismo_corona
-  dir_name = dialog_pickfile(title = 'Select directory with FITs files', /directory, path = '~/data/kink_magnetic/limb2')
+  dir_name = dialog_pickfile(title = 'Select directory with FITs files', /directory, path = '~/data')
   message,'Reading data from '+dir_name +' ...', /info
   seismo_corona_show_status, ev, 'Reading data...'
   files = file_search(filepath('*.fits', root_dir = dir_name))
-  read_sdo, files, index, data,/use_shared_lib, /uncomp_delete
-  data = float(data)
-  
-  ;normolizing exposure
+  read_sdo, files[0], temp_index, temp_data,/use_shared_lib, /uncomp_delete
+  sz = size(temp_data)
+  nx = sz[1]
+  ny = sz[2]
   nt = n_elements(files)
+  data_dir =filepath("data",root = global["project_dir"])
+  data_file =filepath("images.dat",root =data_dir)
+  file_mkdir, data_dir
+  data = mmf_create(data_file, nx, ny, nt, segname = segment)
+  global["data_segment"] = segment
+  index = replicate(temp_index,nt)
   for i =0, nt -1 do begin
-    data[*,*,i] /= index[i].exptime
+    read_sdo, files[i], temp_index, temp_data,/use_shared_lib, /uncomp_delete
+    temp_data /= temp_index.exptime
+    data[*,*,i] = temp_data
+    index[i] = temp_index
   endfor
-  
   message,'Reading data complete', /info
   sz = size(data)
   global['index'] = temporary(index)
-  global['data'] = temporary(data)
   global['state'] = 'data loaded'
   frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
   widget_control, frame_selector, SET_SLIDER_MAX = sz[3] - 1
@@ -134,8 +157,8 @@ common seismo_corona
   
   x_arcsec = hdr2x(index)
   y_arcsec = hdr2y(index) 
-  
-  implot, comprange(global['data',*,*,frame_num],/global), x_arcsec, y_arcsec,/iso, $
+  data = shmvar(global["data_segment"])
+  implot, comprange(data[*,*,frame_num],/global), x_arcsec, y_arcsec,/iso, $
     xtitle = 'X [arcsec]', ytitle = "Y [arcsec]"
   seismo_corona_plot_loops, ev
   
@@ -254,8 +277,8 @@ pro  seismo_corona_td_back, ev
   ;Read current frame
   time_range_selector = widget_info(ev.top, find_by_uname = 'time_range_selector')
   widget_control, time_range_selector, get_value = td_window
-  
-  n_frames =  n_elements(global['data',0,0,*])
+  data = shmvar(global['data_segment'])
+  n_frames =  n_elements(data)
   
   new_frame_num = (frame_num - fix(td_window/5))>0
   widget_control, frame_selector, set_value = new_frame_num
@@ -274,7 +297,8 @@ pro  seismo_corona_td_forward, ev
   time_range_selector = widget_info(ev.top, find_by_uname = 'time_range_selector')
   widget_control, time_range_selector, get_value = td_window
   
-  n_frames =  n_elements(global['data',0,0,*])
+  data = shmvar(global['data_segment'])
+  n_frames =  n_elements(data)
   
   new_frame_num = (frame_num + fix(td_window/5))<n_frames
   widget_control, frame_selector, set_value = new_frame_num
@@ -330,6 +354,8 @@ end
 pro seismo_corona_save, ev
 compile_opt idl2
 common seismo_corona
+  message,'save project placeholder',/info
+  return
    file = dialog_pickfile(DEFAULT_EXTENSION = 'prj.sav', title = 'Select file where to save current project',$
   path = '~/data/kink_magnetic/limb2')
    seismo_corona_show_status, ev, "Saving data.."
@@ -359,6 +385,15 @@ end
 pro seismo_corona_cleanup, ev
 compile_opt idl2
 common seismo_corona
+  if global.haskey("data_segment") then begin
+    shmunmap, global["data_segment"]
+    index_file = filepath('index.sav',root_dir = global["project_dir"])
+    save, global, file = index_file
+  endif
+  for i = 0, n_elements(global["loops"]) -1 do begin
+    data_segment = global["loops", i, "data_segment"]
+    shmunmap, data_segment
+  endfor
   global.remove,global.keys()
   global = []
   message,'CleanUP completed',/info
