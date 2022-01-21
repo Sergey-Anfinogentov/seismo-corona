@@ -82,6 +82,22 @@ common seismo_corona
   return, td
 end
 
+function seismo_corona_get_td_long, loop_index, slit_num, slit_width
+  compile_opt idl2
+  common seismo_corona
+  td_data = shmvar(global['loops', loop_index, 'data_segment'])
+  if slit_width le 2 then begin
+    td = reform(td_data[ *, *,slit_num])
+  endif else begin
+    w_2 = (slit_width-1)/2
+    length = n_elements(td_data[0,0,*])&
+    slit_st = (slit_num - w_2)>0
+    slit_en = (slit_num + w_2)<(length-1)
+    td = total(td_data[ *,  *,slit_st:slit_en],3)
+  endelse
+  return, td
+end
+
 function seismo_corona_loop_length, index, ev
 compile_opt idl2
 
@@ -247,7 +263,7 @@ pro fit_loop_profile, x, profile, centre, sigma, amplitude
   par_info.value = start_params
   par_info[0].limits = [0d,max(profile) - min(profile)]
   par_info[1].limits = start_centre + [-5.,5.];minmax(x)
-  par_info[2].limits = [0.3d,3d];[1d,(max(x)-min(x))*0.5d]
+  par_info[2].limits = [0.3d,10d];[1d,(max(x)-min(x))*0.5d]
   for i = 3, 3+n_poly-1 do par_info[i].limited = [0,0]
   
   fit_par = mpfitfun('loop_profile',x,profile, error,parinfo = par_info, weights = 1d, /quiet)
@@ -422,7 +438,7 @@ common seismo_corona
   data_file = filepath('images.dat', root_dir = data_dir)
   
   if not file_test(data_file) then message, "Images data file '"+data_file+"' not found"
-  restore, index_file
+  restore, index_file, /relaxed
   global["project_dir"] = project_dir
   data = mmf_open(data_file, segname = segment)
   global["data_segment"] = segment

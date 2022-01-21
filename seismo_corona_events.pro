@@ -45,7 +45,24 @@ end
 
 pro seismo_corona_delete_loop, ev
 compile_opt idl2
+common seismo_corona
   print, 'Delete_loop'
+  loop_index = seismo_corona_get_current_loop(ev)
+  segment = global['loops', loop_index, 'data_segment']
+  
+  help,/shared,out=out
+  ;stop
+  ind=where(strmatch(out,segment+'*'))
+  if ind[0] eq -1 then message, 'No segment found'
+  info=out[ind[0]+1]
+  file=(stregex(info,'<MappedFile\((.*)\),.*,.*>',/subexpr,/extr))[1]
+  if file eq '' then message,'No memory mapped file found'
+  shmunmap,segment
+  file_delete, file
+  global["loops"].remove, loop_index
+  seismo_corona_set_curent_loop, ev, 0
+  seismo_corona_select_loop, ev
+  
 end
 pro seismo_corona_select_loop, ev
 compile_opt idl2
@@ -116,11 +133,15 @@ common seismo_corona
   data = mmf_create(data_file, nx, ny, nt, segname = segment)
   global["data_segment"] = segment
   index = replicate(temp_index,nt)
+  buffer_index = temp_index
   for i =0, nt -1 do begin
     read_sdo, files[i], temp_index, temp_data,/use_shared_lib, /uncomp_delete
     temp_data /= temp_index.exptime
     data[*,*,i] = temp_data
-    index[i] = temp_index
+    ;index[i] = temp_index
+    
+    STRUCT_ASSIGN,temp_index,buffer_index
+    index[i] = buffer_index
   endfor
   message,'Reading data complete', /info
   sz = size(data)
@@ -179,7 +200,9 @@ compile_opt idl2
   endfor
   loop_index = seismo_corona_get_current_loop(ev)
   if loop_index ge 0 then begin
-    oplot, global['loops',loop_index,'x'], global['loops',loop_index, 'y'], thick = 2
+    loadct, 5
+    oplot, global['loops',loop_index,'x'], global['loops',loop_index, 'y'], thick = 2, color = 200
+    loadct,0
   endif
 end
 
@@ -239,15 +262,87 @@ common seismo_corona
   if plot_fit and global['loops',loop_index].haskey('oscillation') then begin
     t = global['loops',loop_index,'oscillation','time']
     c = global['loops',loop_index,'oscillation','centre']
-    fit = global['loops',loop_index,'oscillation','mcmc','fit']
     loadct,3
     oplot, t, c, psym = 1, color = 128
-    loadct,8
-    oplot, t, fit, color = 128
+    if global['loops',loop_index,'oscillation'].haskey('mcmc') then begin
+      fit = global['loops',loop_index,'oscillation','mcmc','fit']
+      loadct,8
+      oplot, t, fit, color = 128
+    end
     loadct,0
   endif
   
 end
+
+
+pro seismo_corona_plot_td_long, ev
+  compile_opt idl2
+  common seismo_corona
+  if global['loops'].count() eq 0 then return
+
+  ;reed current loop
+  loop_index = seismo_corona_get_current_loop(ev)
+
+  ;Read current slit
+  slit_selector = widget_info(ev.top, find_by_uname = 'slit_selector_long')
+  widget_control, slit_selector, get_value = slit_num
+
+
+  ;Read slit width
+  slit_width_selector = widget_info(ev.top, find_by_uname = 'slit_width_selector_long')
+  widget_control, slit_width_selector, get_value = slit_width
+
+  ;Read current frame
+  frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
+  widget_control, frame_selector, get_value = frame_num
+
+  ;Read current frame
+  time_range_selector = widget_info(ev.top, find_by_uname = 'time_range_selector_long')
+  widget_control, time_range_selector, get_value = td_window
+
+  ;Read brightness range
+  brightness_range_down_selector = widget_info(ev.top, find_by_uname = 'brightness_range_down_selector_long')
+  widget_control, brightness_range_down_selector, get_value = limit_down
+  brightness_range_up_selector = widget_info(ev.top, find_by_uname = 'brightness_range_up_selector_long')
+  widget_control, brightness_range_up_selector, get_value = limit_up
+
+
+  td =  seismo_corona_get_td_long(loop_index, slit_num, slit_width)
+
+  draw_td = widget_info(ev.top, find_by_uname = 'draw_td_long')
+  sz = size(td)
+  WIDGET_CONTROL, draw_td, GET_VALUE = win
+
+  xrange = frame_num + [-td_window/2., td_window/2.]
+
+  td_min = min(td)
+  td_max = max(td)
+  range = td_max - td_min
+  limit_down = td_min + range * (limit_down/100d)
+  limit_up = td_min + range * (limit_up/100d)
+
+  wset,win
+  implot, td>limit_down<limit_up,  xtitle = "Time [frames]", ytitle = "Distance [pixels]", xrange = xrange
+  oplot, [frame_num, frame_num], [0,sz[2] - 1]
+
+;  switch_plot_osc = widget_info(ev.top, find_by_uname = 'switch_plot_osc')
+;
+;  plot_fit = widget_info(switch_plot_osc, /button_set)
+;  if plot_fit and global['loops',loop_index].haskey('oscillation') then begin
+;    t = global['loops',loop_index,'oscillation','time']
+;    c = global['loops',loop_index,'oscillation','centre']
+;    loadct,3
+;    oplot, t, c, psym = 1, color = 128
+;    if global['loops',loop_index,'oscillation'].haskey('mcmc') then begin
+;      fit = global['loops',loop_index,'oscillation','mcmc','fit']
+;      loadct,8
+;      oplot, t, fit, color = 128
+;    end
+;    loadct,0
+;  endif
+
+end
+
 
 pro  seismo_corona_switch_view, ev
 compile_opt idl2
@@ -263,6 +358,11 @@ common seismo_corona
     seismo_corona_plot_td, ev 
     widget_control, fit_osc, sensitive = 1
     widget_control, switch_plot_osc, sensitive = 1
+  endif
+  if ev.tab eq 2 then begin ;TD view
+    seismo_corona_plot_td_long, ev
+    ;widget_control, fit_osc, sensitive = 1
+    ;widget_control, switch_plot_osc, sensitive = 1
   endif
 end
 
@@ -285,6 +385,28 @@ pro  seismo_corona_td_back, ev
   seismo_corona_plot_td, ev
  
 end
+
+pro  seismo_corona_td_back_long, ev
+  compile_opt idl2
+  common seismo_corona
+
+  ;Read current frame
+  frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
+  widget_control, frame_selector, get_value = frame_num
+
+  ;Read current frame
+  time_range_selector = widget_info(ev.top, find_by_uname = 'time_range_selector_long')
+  widget_control, time_range_selector, get_value = td_window
+  data = shmvar(global['data_segment'])
+  n_frames =  n_elements(data)
+
+  new_frame_num = (frame_num - fix(td_window/5))>0
+  widget_control, frame_selector, set_value = new_frame_num
+  seismo_corona_plot_td_long, ev
+
+end
+
+
 pro  seismo_corona_td_forward, ev
   compile_opt idl2
   common seismo_corona
@@ -306,6 +428,27 @@ pro  seismo_corona_td_forward, ev
   
 end
 
+pro  seismo_corona_td_forward_long, ev
+  compile_opt idl2
+  common seismo_corona
+
+  ;Read current frame
+  frame_selector = widget_info(ev.top, find_by_uname = 'frame_selector')
+  widget_control, frame_selector, get_value = frame_num
+
+  ;Read current frame
+  time_range_selector = widget_info(ev.top, find_by_uname = 'time_range_selector_long')
+  widget_control, time_range_selector, get_value = td_window
+
+  data = shmvar(global['data_segment'])
+  n_frames =  n_elements(data)
+
+  new_frame_num = (frame_num + fix(td_window/5))<n_frames
+  widget_control, frame_selector, set_value = new_frame_num
+  seismo_corona_plot_td_long, ev
+
+end
+
 pro seismo_corona_fit_oscillation, ev
 compile_opt idl2
 common seismo_corona
@@ -324,16 +467,16 @@ common seismo_corona
   
   seismo_corona_measure_loop_position, ev, td, time, centre,sigma, amplitude
   
-  mcmc = fit_decayless(time, centre,  params = params, credible_intervals = credible_intervals, samples = samples)
-  oplot,time, mcmc['fit']
+  ;mcmc = fit_decayless(time, centre,  params = params, credible_intervals = credible_intervals, samples = samples)
+  ;oplot,time, mcmc['fit']
   
   ;updating loop data
   
-  ind = where(mcmc['parnames'] eq 'period')
-  period = mcmc['estimate',ind]
+  ;ind = where(mcmc['parnames'] eq 'period')
+ ; period = mcmc['estimate',ind]
   
-  ind = where(mcmc['parnames'] eq 'amplitude')
-  amplitude = mcmc['estimate',ind]
+  ;ind = where(mcmc['parnames'] eq 'amplitude')
+  ;amplitude = mcmc['estimate',ind]
   
   oscillation = hash()
   oscillation['td'] = td
@@ -342,9 +485,9 @@ common seismo_corona
   oscillation['time']=time
   oscillation['centre'] = centre
   oscillation['sigma'] = sigma
-  oscillation['period'] = period
+  oscillation['period'] = 0.;period
   oscillation['amplitude'] = amplitude
-  oscillation['mcmc'] =mcmc
+  ;oscillation['mcmc'] =mcmc
   global['loops', loop_index, 'oscillation'] = oscillation
   
   
@@ -372,6 +515,13 @@ compile_opt idl2
 common seismo_corona
   loop_index = seismo_corona_get_current_loop(ev)
   oscillation = global['loops',loop_index,'oscillation']
+  
+  time =  anytim(global["index"].t_obs)
+  time_index = oscillation["time"]
+  
+  oscillation["time"] = oscillation["time"]
+  oscillation["time_index"] = time_index
+  oscillation=oscillation.tostruct()
   save,oscillation, file = dialog_pickfile(DEFAULT_EXTENSION = 'osc.sav', title = 'Select file where to save oscillation data')
 
 end
